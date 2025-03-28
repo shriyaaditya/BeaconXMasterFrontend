@@ -38,8 +38,8 @@ export default function Navbar() {
     <nav
       className={`fixed w-full z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-gradient-to-r from-[#45a247] to-[#283c86] backdrop-blur-sm shadow-lg"
-          : "bg-gradient-to-r from-[#45a247] to-[#283c86] backdrop-blur-sm"
+          ? "bg-gradient-to-r from-teal-800 to-teal-400 backdrop-blur-sm shadow-lg"
+          : "bg-gradient-to-r from-teal-800 to-teal-400 backdrop-blur-sm"
       }`}
     >
       <div className="max-w-7xl mx-auto px-6">
@@ -103,7 +103,7 @@ export default function Navbar() {
                 </svg>
               </div>
               <div className="font-bold text-2xl text-white transition-all duration-300 group-hover:text-sky-100">
-                Beacon<span className="text-sky-200">X</span>
+                Beacon<span className="text-teal-200">X</span>
               </div>
             </Link>
           </div>
@@ -118,7 +118,7 @@ export default function Navbar() {
                     key={link.name}
                     href={link.path}
                     className={`flex items-center space-x-2 mx-1 px-4 py-2.5 rounded-md
-                      transition-all duration-300 text-white/90 hover:text-white
+                      transition-all duration-300 text-white/80 hover:text-white
                       relative group overflow-hidden ${isActive ? "bg-white/15 text-white" : ""}`}
                   >
                     <span className="relative z-10 transition-transform group-hover:scale-110 duration-300">
@@ -146,7 +146,7 @@ export default function Navbar() {
                 href="/login"
                 className="flex items-center space-x-2 px-4 py-2.5 rounded-md
                   transition-all duration-300 text-white/90 hover:text-white
-                  border border-white/20 hover:border-white/40 relative group overflow-hidden"
+                  border border-white/20 hover:border-teal-600 relative group overflow-hidden"
                 aria-label="Login"
               >
                 <span className="relative z-10 transition-transform group-hover:scale-110 duration-300">
@@ -156,14 +156,14 @@ export default function Navbar() {
 
                 {/* Hover background effect */}
                 <span
-                  className="absolute inset-0 bg-white/0 group-hover:bg-white/15 
+                  className="absolute inset-0 bg-white/0 group-hover:bg-teal-600
                   transition-all duration-300 transform translate-y-full group-hover:translate-y-0 rounded-md"
                 ></span>
               </Link>
               <Link
                 href="/register"
                 className="flex items-center space-x-2 px-4 py-2.5 rounded-md 
-                  bg-sky-500 text-white relative group overflow-hidden
+                  bg-teal-600 text-white relative group overflow-hidden
                   transition-all duration-300 shadow-lg shadow-sky-500/20"
                 aria-label="Register"
               >
@@ -174,7 +174,7 @@ export default function Navbar() {
 
                 {/* Hover background effect */}
                 <span
-                  className="absolute inset-0 bg-sky-400/0 group-hover:bg-sky-400 
+                  className="absolute inset-0 bg-sky-400/0 group-hover:bg-teal-500 
                   transition-all duration-300 transform translate-y-full group-hover:translate-y-0 rounded-md"
                 ></span>
               </Link>

@@ -88,7 +88,7 @@ export default function HeroSection() {
       </div>
 
       {/* Main Content */}
-      <div className="bg-gradient-to-br from-teal-900 to-green-800 text-white">
+      <div className="bg-gradient-to-br from-teal-100 to-teal-300">
         <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
@@ -99,10 +99,10 @@ export default function HeroSection() {
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
                 Guiding Light Through{" "}
-                <span className="text-green-400">Difficult Times</span>
+                <span className="text-teal-800">Difficult Times</span>
               </h1>
 
-              <p className="text-lg md:text-xl text-teal-100/90 max-w-xl">
+              <p className="text-lg md:text-x max-w-xl">
                 BeaconX provides critical guidance, resources, and real-time updates
                 during natural disasters to help you and your loved ones stay safe.
               </p>
@@ -110,27 +110,27 @@ export default function HeroSection() {
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Link
                   href="/resources"
-                  className="inline-flex items-center justify-center bg-green-700 hover:bg-green-600 text-white font-medium px-6 py-3 rounded-lg border border-green-600 transition-colors duration-200"
+                  className="inline-flex items-center justify-center bg-teal-800 hover:bg-teal-700 text-white font-medium px-6 py-3 rounded-lg border border-teal-700 transition-colors duration-200"
                 >
                   Find Resources
                 </Link>
               </div>
 
-              <div className="flex items-center text-teal-300/80 pt-4">
+              <div className="flex items-center pt-4">
                 <MapPin className="h-5 w-5 mr-2" />
                 <span className="text-sm">Location-based guidance available</span>
               </div>
             </div>
 
             {/* Map Section */}
-            <div className="bg-teal-800 rounded-xl overflow-hidden shadow-2xl h-[300px] md:h-[400px]">
+            <div className="rounded-xl overflow-hidden shadow-2xl h-[300px] md:h-[400px]">
               <div className="p-4 bg-teal-700 flex items-center justify-between">
-                <h3 className="font-semibold text-teal-100 flex items-center">
+                <h3 className="font-semibold text-white flex items-center">
                   <Navigation className="h-4 w-4 mr-2" />
                   Your Current Location
                 </h3>
                 {isLoadingLocation && (
-                  <div className="flex items-center text-teal-200 text-sm">
+                  <div className="flex items-center text-white text-sm">
                     <Loader className="h-4 w-4 mr-2 animate-spin" />
                     Locating...
                   </div>
@@ -141,9 +141,9 @@ export default function HeroSection() {
                 {locationError ? (
                   <div className="absolute inset-0 flex items-center justify-center flex-col p-6 text-center">
                     <AlertCircle className="h-10 w-10 text-red-400 mb-2" />
-                    <p className="text-teal-100">{locationError}</p>
+                    <p className="text-teal-50">{locationError}</p>
                     <button
-                      className="mt-4 px-4 py-2 bg-teal-600 rounded-md text-sm hover:bg-teal-500 transition-colors"
+                      className="mt-4 px-4 py-2 bg-teal-800 rounded-md text-sm hover:bg-teal-600 transition-colors"
                       onClick={getLocation}
                     >
                       Try Again
@@ -151,7 +151,7 @@ export default function HeroSection() {
                   </div>
                 ) : isLoadingLocation ? (
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="h-16 w-16 border-4 border-teal-400 border-t-transparent rounded-full animate-spin" />
+                    <div className="h-16 w-16 border-4 border-teal-700 border-t-transparent rounded-full animate-spin" />
                   </div>
                 ) : location ? (
                   <>
@@ -198,12 +198,12 @@ export default function HeroSection() {
           </div>
 
           {/* Safety Status */}
-          <div className="mt-8 bg-teal-800/50 rounded-lg p-4 max-w-3xl mx-auto">
-            <h3 className="text-teal-100 font-medium mb-2">Your Area Safety Status</h3>
+          <div className="mt-8 rounded-lg p-4 max-w-3xl mx-auto">
+            <h3 className="text-teal-800 font-medium mb-2">Your Area Safety Status</h3>
             <div className="h-2 bg-teal-900 rounded-full overflow-hidden">
               <div className="h-full bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 w-3/4" />
             </div>
-            <div className="flex justify-between text-xs text-teal-300 mt-1">
+            <div className="flex justify-between text-xs mt-1">
               <span>High Risk</span>
               <span>Moderate</span>
               <span>Safe</span>
