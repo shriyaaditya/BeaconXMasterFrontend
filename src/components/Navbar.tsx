@@ -36,7 +36,7 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`fixed w-full z-50 transition-all duration-300 ${
+      className={`relative w-full z-50 transition-all duration-300 ${
         scrolled
           ? "bg-gradient-to-r from-teal-800 to-teal-400 backdrop-blur-sm shadow-lg"
           : "bg-gradient-to-r from-teal-800 to-teal-400 backdrop-blur-sm"
