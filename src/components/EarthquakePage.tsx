@@ -15,8 +15,23 @@ import {
   Navigation,
 } from "lucide-react";
 
+interface EarthquakeData {
+  magnitude: number;
+  location: string;
+  time: string;
+  updated: string;
+  coordinates: [number, number, number]; // [longitude, latitude, depth]
+  tsunami: number;
+  sig: number;
+  nst: number | null;
+  gap: number | null;
+  status: string;
+  magType: string;
+  rms: number | null;
+}
+
 export default function EarthquakePage() {
-  const [earthquake, setEarthquake] = useState<any>(null);
+  const [earthquake, setEarthquake] = useState<EarthquakeData | null>(null);
 
   async function getEarthquakesNearLocation(
     lat: number,
@@ -39,9 +54,11 @@ export default function EarthquakePage() {
           coordinates: event.geometry.coordinates,
           tsunami: event.properties.tsunami,
           sig: event.properties.sig,
-          nst: event.properties.nst,
-          gap: event.properties.gap,
+          nst: event.properties.nst || null,
+          gap: event.properties.gap || null,
           status: event.properties.status,
+          magType: event.properties.magType,
+          rms: event.properties.rms || null,
         });
       }
     } catch (error) {
@@ -49,7 +66,6 @@ export default function EarthquakePage() {
     }
   }
 
-  // Fetch data on mount
   useEffect(() => {
     getEarthquakesNearLocation(37.7749, -122.4194, 50);
   }, []);
@@ -146,11 +162,11 @@ export default function EarthquakePage() {
               </h3>
             </div>
             <p className="text-2xl font-bold text-emerald-700">
-              {earthquake ? `${earthquake.gap}°` : "Loading..."}
+              {earthquake && earthquake.gap !== null ? `${earthquake.gap}°` : "N/A"}
             </p>
           </div>
 
-          {/* seismic stations */}
+          {/* Seismic Stations */}
           <div className="bg-white p-6 rounded-4xl h-40 w-50 shadow-lg border border-gray-100">
             <div className="flex items-center gap-3 mb-2">
               <Zap className="w-6 h-6 text-purple-600" />
@@ -161,16 +177,18 @@ export default function EarthquakePage() {
             <p className="text-sm text-gray-600">
               Count:{" "}
               <span className="font-semibold">
-                {earthquake ? earthquake.nst : "Loading..."}
+                {earthquake && earthquake.nst !== null ? earthquake.nst : "N/A"}
               </span>
             </p>
             <p className="text-sm text-gray-600">
               RMS:{" "}
               <span className="font-semibold">
-                {earthquake ? earthquake.rms : "Loading..."}
+                {earthquake && earthquake.rms !== null ? earthquake.rms : "N/A"}
               </span>
             </p>
           </div>
+
+          {/* Time */}
           <div className="bg-white p-6 rounded-4xl h-40 w-50 shadow-lg border border-gray-100">
             <div className="flex items-center gap-3 mb-2">
               <Clock className="w-6 h-6 text-black" />
@@ -185,70 +203,72 @@ export default function EarthquakePage() {
               {earthquake ? earthquake.updated : "Loading..."}
             </p>
           </div>
+
+          {/* Magnitude Type */}
           <div className="bg-white p-6 rounded-4xl h-40 w-50 shadow-lg border border-gray-100">
-  <div className="flex items-center gap-3 mb-2">
-    <Zap className="w-6 h-6 text-purple-600" />
-    <h3 className="text-lg font-semibold text-gray-800">Magnitude Type</h3>
-  </div>
-  <p className="text-3xl font-bold text-purple-700">
-    {earthquake ? earthquake.magType : "Loading..."}
-  </p>
-  <p className="text-sm text-gray-500 mt-1">
-    {earthquake ? (earthquake.magType === "ml" ? "Local Magnitude (Richter)" : "Duration Magnitude") : "Loading..."}
-  </p>
-</div>
-
-        </div>
-        </div>
-        <div className="flex flex-row">
-        <div className=" bg-green-50 p-6  h-27 w-100 rounded-lg shadow-sm border border-green-100">
-        <div className="flex items-center gap-3">
-          <motion.div
-            animate={{ scale: [1, 1], rotate: [0, 10, -10, 0] }}
-            transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <Shield className="w-8 h-8 text-green-600" />
-          </motion.div>
-          <div>
-            <h2 className="text-2xl font-bold text-green-700">5</h2>
-            <p className="text-green-600">Tremor Zones</p>
-          </div>
-        </div>
-      </div>
-      
-      <div className="flex flex-row bg-yellow-50 p-6  h-27 w-100 rounded-lg shadow-sm border border-yellow-100">
-        <div className="flex items-center gap-3">
-          <motion.div
-            animate={{ scale: [1, 1], rotate: [0, 10, -10, 0] }}
-            transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <AlertTriangle className="w-8 h-8 text-yellow-600" />
-          </motion.div>
-          <div>
-            <h2 className="text-2xl font-bold text-yellow-700">5</h2>
-            <p className="text-yellow-600">Tremor Zones</p>
+            <div className="flex items-center gap-3 mb-2">
+              <Zap className="w-6 h-6 text-purple-600" />
+              <h3 className="text-lg font-semibold text-gray-800">Magnitude Type</h3>
+            </div>
+            <p className="text-3xl font-bold text-purple-700">
+              {earthquake ? earthquake.magType : "Loading..."}
+            </p>
+            <p className="text-sm text-gray-500 mt-1">
+              {earthquake ? (earthquake.magType === "ml" ? "Local Magnitude (Richter)" : "Duration Magnitude") : "Loading..."}
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Siren Alert (if needed) */}
-      <div className="flex flex-row bg-red-50 p-6  h-27 w-100  rounded-lg shadow-sm border border-red-100">
-        <div className="flex items-center gap-3">
-          <motion.div
-            animate={{ scale: [1, 1.1],rotate: [0, 10, -10, 0], opacity: [1, 0.5, 1] }}
-            transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <Siren className="w-8 h-8 text-red-600" />
-          </motion.div>
-          <div>
-            <h2 className="text-2xl font-bold text-red-700">3</h2>
-            <p className="text-red-600">High Alert Zones</p>
+      <div className="flex flex-row p-4 gap-4">
+        {/* Safety Status */}
+        <div className="bg-green-50 p-6 h-27 w-100 rounded-lg shadow-sm border border-green-100">
+          <div className="flex items-center gap-3">
+            <motion.div
+              animate={{ scale: [1, 1], rotate: [0, 10, -10, 0] }}
+              transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <Shield className="w-8 h-8 text-green-600" />
+            </motion.div>
+            <div>
+              <h2 className="text-2xl font-bold text-green-700">5</h2>
+              <p className="text-green-600">Tremor Zones</p>
+            </div>
+          </div>
+        </div>
+        
+        {/* Warning Status */}
+        <div className="bg-yellow-50 p-6 h-27 w-100 rounded-lg shadow-sm border border-yellow-100">
+          <div className="flex items-center gap-3">
+            <motion.div
+              animate={{ scale: [1, 1], rotate: [0, 10, -10, 0] }}
+              transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <AlertTriangle className="w-8 h-8 text-yellow-600" />
+            </motion.div>
+            <div>
+              <h2 className="text-2xl font-bold text-yellow-700">5</h2>
+              <p className="text-yellow-600">Warning Zones</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Alert Status */}
+        <div className="bg-red-50 p-6 h-27 w-100 rounded-lg shadow-sm border border-red-100">
+          <div className="flex items-center gap-3">
+            <motion.div
+              animate={{ scale: [1, 1.1], rotate: [0, 10, -10, 0], opacity: [1, 0.5, 1] }}
+              transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <Siren className="w-8 h-8 text-red-600" />
+            </motion.div>
+            <div>
+              <h2 className="text-2xl font-bold text-red-700">3</h2>
+              <p className="text-red-600">High Alert Zones</p>
+            </div>
           </div>
         </div>
       </div>
-      </div>
-
-
     </main>
   );
 }
