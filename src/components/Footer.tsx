@@ -15,7 +15,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-gradient-to-b from-teal-500 to-teal-800 text-white mt-auto">
+    <footer className="bg-gradient-to-b from-teal-500 to-teal-800 text-white mt-auto z-10">
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex flex-col items-center space-y-8">
           {/* Animated Logo */}

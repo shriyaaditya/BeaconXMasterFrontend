@@ -193,16 +193,16 @@ export default function ChatbotPage() {
       <header className="bg-teal-500 text-white p-4 shadow-md">
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center">
-            <div className="w-10 h-10 rounded-full bg-white p-1 mr-3 flex items-center justify-center">
-              <AlertCircle className="text-teal-500" size={24} />
+            <div className="w-5 h-5 rounded-full bg-white p-1 mr-3 flex items-center justify-center">
+              <AlertCircle className="text-teal-500" size={15} />
             </div>
-            <h1 className="text-2xl font-bold">BeaconX Helper</h1>
+            <h1 className="text-[20px] font-bold">BeaconX Helper</h1>
           </div>
-          <div className="text-sm bg-teal-600 px-3 py-1 rounded-full">Emergency Helper</div>
+          <div className="text-xs bg-teal-600 px-3 py-1 rounded-full">Emergency Helper</div>
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto p-4 container mx-auto max-w-4xl">
+      <div className="flex-1 overflow-y-auto p-4 container mx-auto max-w-4xl text-xs">
         <div className="space-y-4">
           {messages.map((message) => (
             <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -211,8 +211,8 @@ export default function ChatbotPage() {
                   <Image
                     src="https://res.cloudinary.com/dk6m1qejk/image/upload/v1743224946/BeaconX/vucn1vauizfpcsgietkd.png"
                     alt="BeaconX"
-                    width={40}
-                    height={40}
+                    width={30}
+                    height={30}
                     className="rounded-full"
                   />
                 </div>
@@ -225,7 +225,7 @@ export default function ChatbotPage() {
                 }`}
               >
                 <p 
-                  className="whitespace-pre-wrap text-lg" 
+                  className="whitespace-pre-wrap text-sm" 
                   dangerouslySetInnerHTML={formatMessage(message.content)}
                 />
                 {message.role === "assistant" && (
@@ -240,7 +240,7 @@ export default function ChatbotPage() {
                     aria-label={isSpeaking ? "Currently speaking" : "Read message aloud"}
                   >
                     <Volume2
-                      size={16}
+                      size={13}
                       className={`mr-1 ${
                         isSpeaking && message.id === messages[messages.length - 1]?.id ? "animate-pulse" : ""
                       }`}
@@ -280,22 +280,22 @@ export default function ChatbotPage() {
         </div>
       </div>
 
-      <div className="border-t-4 border-teal-200 bg-white p-6">
-        <div className="container mx-auto max-w-4xl">
+      <div className="border-t-4 border-teal-200 p-3 bg-white h-[90px]">
+        <div className="container mx-auto max-w-2xl h-[2px]">
           <form onSubmit={handleSubmit} className="flex space-x-3">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={isListening ? "Listening..." : "Ask me anything..."}
-              className="flex-1 p-4 text-lg border-2 border-teal-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-teal-200 focus:border-teal-500"
+              className="flex-1 p-2 text-sm text-black border-2 border-teal-300 rounded-2xl focus:outline-none focus:ring-4 focus:ring-teal-200 focus:border-teal-500"
               disabled={isLoading || isListening}
               aria-label="Type your message"
             />
             <button
               type="button"
               onClick={() => setIsListening(prev => !prev)}
-              className={`p-4 rounded-2xl focus:outline-none focus:ring-4 focus:ring-teal-200 ${
+              className={`p-2 rounded-2xl focus:outline-none focus:ring-4 focus:ring-teal-200 ${
                 isListening 
                   ? "bg-red-500 text-white hover:bg-red-600" 
                   : "bg-teal-100 text-teal-600 hover:bg-teal-200"
@@ -303,18 +303,18 @@ export default function ChatbotPage() {
               disabled={isLoading}
               aria-label={isListening ? "Stop recording" : "Start voice recording"}
             >
-              <Mic size={24} />
+              <Mic size={20} />
             </button>
             <button
               type="submit"
-              className="bg-teal-500 text-white p-4 rounded-2xl hover:bg-teal-600 focus:outline-none focus:ring-4 focus:ring-teal-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-teal-500 text-white p-2 rounded-2xl hover:bg-teal-600 focus:outline-none focus:ring-4 focus:ring-teal-200 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isLoading || !input.trim()}
               aria-label="Send message"
             >
-              <Send size={24} />
+              <Send size={20} />
             </button>
           </form>
-          <p className="text-center mt-4 text-teal-600 text-sm">
+          <p className="text-center mt-2 text-teal-600 text-sm">
             {isListening
               ? "I'm listening to you! Speak clearly..."
               : "Type your question or click the microphone to speak"}

@@ -10,6 +10,7 @@ export default function HeroSection() {
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [locationError, setLocationError] = useState<string | null>(null)
   const [isLoadingLocation, setIsLoadingLocation] = useState(false)
+  
 
   const topAlerts = [
     "ALERT: Heavy rainfall expected in coastal areas. Stay prepared.",

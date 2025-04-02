@@ -1,25 +1,27 @@
+"use client"
+
 import './global.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-
-export const metadata = {
-  title: 'BeaconX',
-  description: 'Your personal natural disaster assistant',
-};
+import Chatbutton from '@/components/ChatButton';
+import { usePathname } from 'next/navigation';
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  const isAuthPage = pathname === '/login';
   return (
     <html lang="en">
       <body className="flex flex-col min-h-screen">
-        <Navbar />
+        {!isAuthPage && <Navbar />}
         <main className="flex-1">
           {children}
         </main>
-        <Footer />
+        {!isAuthPage && <Chatbutton />}
+        {!isAuthPage && <Footer />}
       </body>
     </html>
   );

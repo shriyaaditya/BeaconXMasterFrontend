@@ -45,7 +45,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex h-20">
           {/* CLUSTER 1: Logo with SVG animation */}
-          <div className="flex items-center justify-start w-1/4 border-r border-white/10 pr-6">
+          <div className="flex items-center justify-start w-1/4 pr-6">
             <Link href="/" className="group flex items-center space-x-3">
               <div className="relative h-12 w-12 transition-transform duration-500 group-hover:scale-110">
                 <svg
@@ -110,14 +110,14 @@ export default function Navbar() {
 
           {/* CLUSTER 3: Navigation Links (centered) */}
           <div className="hidden md:flex flex-1 items-center justify-center">
-            <div className="flex items-center space-x-2 px-4">
+            <div className="flex items-center space-x-2 px-2">
               {navLinks.map((link) => {
                 const isActive = pathname === link.path
                 return (
                   <Link
                     key={link.name}
                     href={link.path}
-                    className={`flex items-center space-x-2 mx-1 px-4 py-2.5 rounded-md
+                    className={`flex items-center space-x-2 mx-1 px-2 py-2.5 rounded-md
                       transition-all duration-300 text-white/80 hover:text-white
                       relative group overflow-hidden ${isActive ? "bg-white/15 text-white" : ""}`}
                   >
@@ -140,9 +140,9 @@ export default function Navbar() {
           </div>
 
           {/* CLUSTER 2: Login/Register */}
-          <div className="hidden md:flex items-center justify-end w-1/4 border-l border-white/10 pl-6">
+          <div className="hidden md:flex items-center justify-end w-1/4">
             <div className="flex items-center space-x-3">
-              <Link
+              {/* <Link
                 href="/login"
                 className="flex items-center space-x-2 px-4 py-2.5 rounded-md
                   transition-all duration-300 text-white/90 hover:text-white
@@ -152,16 +152,16 @@ export default function Navbar() {
                 <span className="relative z-10 transition-transform group-hover:scale-110 duration-300">
                   <LogIn className="h-5 w-5" />
                 </span>
-                <span className="relative z-10">Login</span>
+                <span className="relative z-10">Login</span> */}
 
                 {/* Hover background effect */}
-                <span
+                {/* <span
                   className="absolute inset-0 bg-white/0 group-hover:bg-teal-600
                   transition-all duration-300 transform translate-y-full group-hover:translate-y-0 rounded-md"
                 ></span>
-              </Link>
+              </Link> */}
               <Link
-                href="/register"
+                href="/login"
                 className="flex items-center space-x-2 px-4 py-2.5 rounded-md 
                   bg-teal-600 text-white relative group overflow-hidden
                   transition-all duration-300 shadow-lg shadow-sky-500/20"
@@ -170,7 +170,7 @@ export default function Navbar() {
                 <span className="relative z-10 transition-transform group-hover:scale-110 duration-300">
                   <UserPlus className="h-5 w-5" />
                 </span>
-                <span className="relative z-10">Register</span>
+                <span className="relative z-10">Login</span>
 
                 {/* Hover background effect */}
                 <span
@@ -236,18 +236,18 @@ export default function Navbar() {
                 border border-white/20 transition-all duration-300 hover:bg-white/10"
               onClick={() => setIsOpen(false)}
             >
-              <LogIn className="h-5 w-5" />
+              <UserPlus className="h-5 w-5" />
               <span>Login</span>
             </Link>
-            <Link
+            {/* <Link
               href="/register"
               className="flex-1 flex items-center justify-center space-x-2 py-3 rounded-lg 
                 bg-sky-500 hover:bg-sky-400 transition-all duration-300"
               onClick={() => setIsOpen(false)}
             >
-              <UserPlus className="h-5 w-5" />
+              <Login className="h-5 w-5" />
               <span>Register</span>
-            </Link>
+            </Link> */}
           </div>
         </div>
       </div>
