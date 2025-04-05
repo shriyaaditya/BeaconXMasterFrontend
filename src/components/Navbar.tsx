@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Menu, X, LogIn, UserPlus, Home, Bell, BookOpen, Package, Users, Info } from "lucide-react"
+import { Menu, X, UserPlus, LogOut, Home, Bell, BookOpen, Package, Users, Info } from "lucide-react"
 import { usePathname } from "next/navigation"
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -19,6 +20,8 @@ export default function Navbar() {
     { name: "Community", path: "/community", icon: <Users className="h-5 w-5" /> },
     { name: "About", path: "/about", icon: <Info className="h-5 w-5" /> },
   ]
+  
+  const { user, logout } = useAuth();
 
   // Handle scroll effect
   useEffect(() => {
@@ -142,42 +145,45 @@ export default function Navbar() {
           {/* CLUSTER 2: Login/Register */}
           <div className="hidden md:flex items-center justify-end w-1/4">
             <div className="flex items-center space-x-3">
-              {/* <Link
-                href="/login"
-                className="flex items-center space-x-2 px-4 py-2.5 rounded-md
-                  transition-all duration-300 text-white/90 hover:text-white
+              {!user ? (
+                <Link
+                  href="/login"
+                  className="flex items-center space-x-2 px-4 py-2.5 rounded-md 
+                    bg-teal-600 text-white relative group overflow-hidden
+                    transition-all duration-300 shadow-lg shadow-sky-500/20"
+                  aria-label="Register"
+                >
+                  <span className="relative z-10 transition-transform group-hover:scale-110 duration-300">
+                    <UserPlus className="h-5 w-5" />
+                  </span>
+                  <span className="relative z-10">Login</span>
+
+                  {/* Hover background effect */}
+                  <span
+                    className="absolute inset-0 bg-sky-400/0 group-hover:bg-teal-500 
+                    transition-all duration-300 transform translate-y-full group-hover:translate-y-0 rounded-md"
+                  ></span>
+                </Link>
+              ) : (
+                <button
+                  onClick={logout}
+                  className="flex items-center space-x-2 px-4 py-2.5 rounded-md
+                  transition-all duration-300 bg-teal-800 hover:text-white
                   border border-white/20 hover:border-teal-600 relative group overflow-hidden"
-                aria-label="Login"
-              >
-                <span className="relative z-10 transition-transform group-hover:scale-110 duration-300">
-                  <LogIn className="h-5 w-5" />
-                </span>
-                <span className="relative z-10">Login</span> */}
+                  aria-label="Login"
+                  >
+                  <span className="relative z-10 transition-transform group-hover:scale-110 duration-300">
+                    <LogOut className="h-5 w-5" />
+                  </span>
+                  <span className="relative z-10">LogOut</span>
 
-                {/* Hover background effect */}
-                {/* <span
-                  className="absolute inset-0 bg-white/0 group-hover:bg-teal-600
-                  transition-all duration-300 transform translate-y-full group-hover:translate-y-0 rounded-md"
-                ></span>
-              </Link> */}
-              <Link
-                href="/login"
-                className="flex items-center space-x-2 px-4 py-2.5 rounded-md 
-                  bg-teal-600 text-white relative group overflow-hidden
-                  transition-all duration-300 shadow-lg shadow-sky-500/20"
-                aria-label="Register"
-              >
-                <span className="relative z-10 transition-transform group-hover:scale-110 duration-300">
-                  <UserPlus className="h-5 w-5" />
-                </span>
-                <span className="relative z-10">Login</span>
-
-                {/* Hover background effect */}
-                <span
-                  className="absolute inset-0 bg-sky-400/0 group-hover:bg-teal-500 
-                  transition-all duration-300 transform translate-y-full group-hover:translate-y-0 rounded-md"
-                ></span>
-              </Link>
+                  {/* Hover background effect */}
+                  <span
+                      className="absolute inset-0 bg-white/0 group-hover:bg-teal-600
+                      transition-all duration-300 transform translate-y-full group-hover:translate-y-0 rounded-md"
+                  ></span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -230,6 +236,7 @@ export default function Navbar() {
 
           {/* Mobile Login/Register */}
           <div className="py-4 border-t border-white/10 flex space-x-3 px-1">
+          {!user ? (
             <Link
               href="/login"
               className="flex-1 flex items-center justify-center space-x-2 py-3 rounded-lg 
@@ -239,15 +246,19 @@ export default function Navbar() {
               <UserPlus className="h-5 w-5" />
               <span>Login</span>
             </Link>
-            {/* <Link
-              href="/register"
+          ) : (
+            <button
+              onClick={() => {
+                logout();
+                setIsOpen(false);
+              }}
               className="flex-1 flex items-center justify-center space-x-2 py-3 rounded-lg 
-                bg-sky-500 hover:bg-sky-400 transition-all duration-300"
-              onClick={() => setIsOpen(false)}
+                border border-white/20 transition-all duration-300 hover:bg-white/10"
             >
-              <Login className="h-5 w-5" />
-              <span>Register</span>
-            </Link> */}
+              <LogOut className="h-5 w-5" />
+              <span>Logout</span>
+            </button>
+          )}
           </div>
         </div>
       </div>

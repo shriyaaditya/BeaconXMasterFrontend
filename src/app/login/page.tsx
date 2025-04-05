@@ -10,8 +10,12 @@ import {
   Shield, 
   Cloud,
 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from "next/navigation";
+
 
 export default function LoginPage() {
+  const { signUp, signIn, user } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: '',
@@ -25,10 +29,11 @@ export default function LoginPage() {
     address: '',
   });
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const calculatePasswordStrength = (password: string) => {
     let strength = 0;
-    if (password.length > 7) strength += 1;
+    if (password.length > 5) strength += 1;
     if (password.match(/[a-z]+/)) strength += 1;
     if (password.match(/[A-Z]+/)) strength += 1;
     if (password.match(/[0-9]+/)) strength += 1;
@@ -36,13 +41,13 @@ export default function LoginPage() {
     return strength;
   };
 
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const password = e.target.value;
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      password
+      [name]: value
     }));
-    setPasswordStrength(calculatePasswordStrength(password));
+    if (name === "password") setPasswordStrength(calculatePasswordStrength(value));
   };
 
   const getCurrentLocation = () => {
@@ -63,16 +68,22 @@ export default function LoginPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const router = useRouter();
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const submissionData = {
-      ...formData,
-      location
-    };
-    console.log('Submission Data:', submissionData);
+    try {
+      if (isLogin) {
+        await signIn(formData.email, formData.password);
+        router.push('/dashboard');
+      } else {
+        await signUp(formData.name, formData.email, formData.password, location.address);
+        router.push('/dashboard');
+      }
+    } catch (error) {
+      console.error("Authentication error:", error);
+    }
   };
 
-  const canvasRef = useRef(null);
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -177,13 +188,18 @@ export default function LoginPage() {
 
     window.addEventListener('resize', handleResize);
 
+    if(user) {
+      router.push('/dashboard');
+    };
+
     return () => {
-        window.removeEventListener('resize', handleResize);
-        scene.remove(particlesMesh);
-        particlesGeometry.dispose();
-        particlesMaterial.dispose();
-      };
-    }, []);
+      window.removeEventListener('resize', handleResize);
+      scene.remove(particlesMesh);
+      particlesGeometry.dispose();
+      particlesMaterial.dispose();
+    };
+      
+  }, [user, router]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-500 to-teal-950 flex items-center justify-center p-4 relative overflow-hidden">
@@ -236,6 +252,9 @@ export default function LoginPage() {
                 type="text"
                 name="name"
                 placeholder="Full Name"
+                autoComplete='name'
+                value={formData.name}
+                onChange={handleInputChange}
                 className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
                 required={!isLogin}
               />
@@ -248,6 +267,9 @@ export default function LoginPage() {
               type="email"
               name="email"
               placeholder="Email Address"
+              autoComplete="email"
+              value={formData.email}
+              onChange={handleInputChange}
               className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
               required
             />
@@ -259,7 +281,9 @@ export default function LoginPage() {
               type="password"
               name="password"
               placeholder="Password"
-              onChange={handlePasswordChange}
+              autoComplete={isLogin ? "current-password" : "new-password"}
+              value={formData.password}
+              onChange={handleInputChange}
               className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
               required
             />
@@ -285,6 +309,7 @@ export default function LoginPage() {
                 type="text"
                 name="address"
                 placeholder="Location Address"
+                autoComplete='street-address'
                 className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
                 value={location.address}
                 onChange={(e) => setLocation(prev => ({...prev, address: e.target.value}))}
