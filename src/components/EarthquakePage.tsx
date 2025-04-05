@@ -238,9 +238,7 @@ export default function EarthquakePage() {
       </p>
     </div>
   </div>
-
-  {/* Map Section - Takes 1/2 Page Width */}
-  
+ 
 
   {/* Tsunami */}
   <div className="bg-gray-800 p-6 rounded-lg">
