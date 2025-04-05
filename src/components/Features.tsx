@@ -1,168 +1,196 @@
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 
+import React, { useState, useRef } from "react";
+import { ChevronLeft, ChevronRight, AlertTriangle, BarChart2, Globe, MessageCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
+
+// Enhanced features data with disaster management specific content and images
 const features = [
-    {
-        name: "Inventory Management",
-        role: "Risk Manager, Global Bank",
-        content: "This tool has revolutionized our credit assessment process. The AI-driven insights have significantly improved our decision-making accuracy."
-    },
-    {
-        name: "Disaster Classification & Management",
-        role: "CEO, FinTech Solutions",
-        content: "The integration was seamless, and the results were immediate. Our loan approval process is now faster and more reliable than ever."
-    },
-    {
-        name: "News",
-        role: "Head of Credit, Regional Bank",
-        content: "The regulatory compliance features give us peace of mind, while the risk scoring model helps us make better lending decisions."
-    },
-    {
-        name: "Chatbot",
-        role: "Head of Credit, Regional Bank",
-        content: "The regulatory compliance features give us peace of mind, while the risk scoring model helps us make better lending decisions."
-    }
+  {
+    name: "Inventory Management",
+    role: "Emergency Response Coordinator",
+    content: "Real-time tracking of emergency supplies and resources enables our team to efficiently allocate materials during crisis situations.",
+    icon: <BarChart2 className="h-16 w-16 text-teal-700" />,
+    image: "/inventory.jpg", 
+    color: "from-teal-500 to-blue-600"
+  },
+  {
+    name: "Disaster Classification & Risk Assessment",
+    role: "Disaster Management Analyst",
+    content: "The AI-powered classification system accurately categorizes disaster types and predicts potential impact zones, helping us prepare appropriate response strategies.",
+    icon: <AlertTriangle className="h-16 w-16 text-orange-600" />,
+    image: "/disaster.jpg", 
+    color: "from-orange-500 to-red-600"
+  },
+  {
+    name: "Global Incident Monitoring",
+    role: "International Relief Coordinator",
+    content: "The comprehensive news aggregation feature provides real-time updates from disaster zones worldwide, allowing us to respond promptly to emerging situations.",
+    icon: <Globe className="h-16 w-16 text-blue-600" />,
+    image: "/api/placeholder/800/400", 
+    color: "from-blue-500 to-indigo-600"
+  },
+  {
+    name: "Acon: Emergency Help Chatbot",
+    role: "Community Support Specialist",
+    content: "The integrated chatbot system enables affected communities to quickly report emergencies and receive critical information when traditional communication channels fail.",
+    icon: <MessageCircle className="h-16 w-16 text-green-600" />,
+    image: "/Acon.jpg", 
+    color: "from-green-500 to-teal-600"
+  },
 ];
 
-const featureslider = () => {
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [isPaused, setIsPaused] = useState(false);
-    const timerRef = useRef(null);
+const FeatureSlider = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const timerRef = useRef<number | null>(null);
 
-    const resetTimer = () => {
-        if (timerRef.current) {
-            clearInterval(timerRef.current);
+  const resetTimer = () => {
+    if (timerRef.current !== null) {
+        clearInterval(timerRef.current);
+    }
+    timerRef.current = window.setInterval(() => {
+        if (!isPaused) {
+            setCurrentIndex(prev => (prev === features.length - 1 ? 0 : prev + 1));
         }
-        timerRef.current = setInterval(() => {
-            if (!isPaused) {
-                setCurrentIndex(prevIndex =>
-                    prevIndex === features.length - 1 ? 0 : prevIndex + 1
-                );
-            }
-        }, 5000);
-    };
-
-    useEffect(() => {
-        resetTimer();
-        return () => {
-            if (timerRef.current) {
-                clearInterval(timerRef.current);
-            }
-        };
-    }, [isPaused]);
-
-    const nextSlide = () => {
-        setCurrentIndex((prevIndex) =>
-            prevIndex === features.length - 1 ? 0 : prevIndex + 1
-        );
-        resetTimer();
-    };
-
-    const prevSlide = () => {
-        setCurrentIndex((prevIndex) =>
-            prevIndex === 0 ? features.length - 1 : prevIndex - 1
-        );
-        resetTimer();
-    };
-
-    const goToSlide = (slideIndex) => {
-        setCurrentIndex(slideIndex);
-        resetTimer();
-    };
-
-    return (
-        <section id="features" className="py-16 bg-[var(--color-background)]">
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 ">
-                <div className="text-center mb-12">
-                    <h2 className="text-3xl font-bold text-teal-800 mb-3 font-sans">
-                        Our Features
-                    </h2>
-                    <div className="w-20 h-1 bg-teal-800 mx-auto rounded-full"></div>
-                </div>
-
-                <div className="relative"
-                    onMouseEnter={() => setIsPaused(true)}
-                    onMouseLeave={() => setIsPaused(false)}>
-                    
-                    {/* Slider container - maintaining exact same dimensions */}
-                    <div className="overflow-hidden rounded-2xl shadow-2xl">
-                        <div className="relative">
-                            <div
-                                className="bg-teal-100 p-6 rounded-lg transition-all duration-500 border-l-4 border-teal-800 min-h-[300px] flex flex-col"
-                                aria-live="polite"
-                                aria-atomic="true"
-                            >
-
-                                <div className="flex flex-col items-center">
-                                    <div className="text-center">
-                                        <p className="font-bold text-[25px] text-gray-900 mb-2 font-sans">{features[currentIndex].name}</p>
-                                    </div>
-                                    <div className="h-1 w-16 bg-teal-500 rounded-full mb-4"></div>
-                                </div>
-
-
-                                <div className="flex flex-col items-center text-center">
-                                    {/* <div className="flex mb-2">
-                                        {[...Array(features[currentIndex].rating)].map((_, i) => (
-                                            <Star key={i} className="h-6 w-6 text-[var(--color-golden)] fill-current mx-0.5" />
-                                        ))}
-                                    </div> */}
-                                    
-
-                                    <blockquote className="text-gray-800 text-lg md:text-xl mt-4 italic font-light leading-relaxed font-serif px-4">
-                                        {features[currentIndex].content}
-                                    </blockquote>
-                                </div>
-
-                                {/* Progress bar
-                                <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-teal-800">
-                                    <div
-                                        className="h-full bg-teal-600 transition-all duration-300 ease-linear"
-                                        style={{
-                                            width: `${((currentIndex + 1) / features.length) * 100}%`
-                                        }}
-                                    ></div>
-                                </div> */}
-
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Navigation buttons */}
-                    <button
-                        onClick={prevSlide}
-                        className="absolute left-0 top-1/2 -translate-y-1/2 -ml-10 md:-ml-16 p-2 rounded-full shadow-lg text-teal-800 hover:teal-100 focus:outline-none z-10 transition-all duration-300 transform hover:scale-110"
-                        aria-label="Previous feature"
-                    >
-                        <ChevronLeft className="h-6 w-6 text-teal-800" />
-                    </button>
-
-                    <button
-                        onClick={nextSlide}
-                        className="absolute right-0 top-1/2 -translate-y-1/2 -mr-10 md:-mr-16 p-2 rounded-full shadow-lg text-[var(--color-golden)] hover:bg-gray-50 focus:outline-none z-10 transition-all duration-300 transform hover:scale-110"
-                        aria-label="Next feature"
-                    >
-                        <ChevronRight className="h-6 w-6 text-teal-800" />
-                    </button>
-
-                    {/* Slide indicators */}
-                    <div className="flex justify-center mt-6">
-                        {features.map((_, index) => (
-                            <button
-                                key={index}
-                                onClick={() => goToSlide(index)}
-                                className={`w-2 h-2 mx-1 rounded-full transition-all duration-300 focus:outline-none ${
-                                    index === currentIndex ? 'bg-teal-800 w-4' : 'bg-teal-600'
-                                }`}
-                                aria-label={`Go to slide ${index + 1}`}
-                            />
-                        ))}
-                    </div>
-                </div>
-            </div>
-        </section>
-    );
+    }, 5000);
 };
 
-export default featureslider;
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev === features.length - 1 ? 0 : prev + 1));
+    resetTimer();
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex((prev) => (prev === 0 ? features.length - 1 : prev - 1));
+    resetTimer();
+  };
+
+  return (
+    <section id="features" className="py-16 bg-teal-100 relative overflow-hidden">
+      {/* Background pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0 bg-grid-gray-900/5 bg-[size:20px_20px]" />
+      </div>
+      
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold text-gray-900">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-700 to-blue-800">
+              Disaster Management Solutions
+            </span>
+          </h2>
+          <div className="w-24 h-1 bg-gradient-to-r from-teal-700 to-blue-800 mx-auto rounded-full mt-3"></div>
+          <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
+            Comprehensive tools designed to help emergency response teams prepare, respond, and recover effectively.
+          </p>
+        </div>
+
+        <div 
+          className="relative"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentIndex}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white rounded-xl shadow-xl overflow-hidden"
+            >
+              <div className="flex flex-col md:flex-row">
+                {/* Left side - Image */}
+                <div className="md:w-1/2 relative h-64 md:h-auto">
+                  <div className={`absolute inset-0 bg-gradient-to-br ${features[currentIndex].color} opacity-20`}></div>
+                  <div className="absolute inset-0 flex items-center justify-center p-6">
+                    <Image 
+                      fill
+                      src={features[currentIndex].image} 
+                      alt={features[currentIndex].name}
+                      className="object-cover w-full h-full rounded-lg shadow-md"
+                    />
+                  </div>
+                </div>
+                
+                {/* Right side - Content */}
+                <div className="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
+                  <div className="mb-4 bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center">
+                    {features[currentIndex].icon}
+                  </div>
+                  
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    {features[currentIndex].name}
+                  </h3>
+                  
+                  <div className={`h-1 w-20 rounded-full my-3 bg-gradient-to-r ${features[currentIndex].color}`}></div>
+                  
+                  <blockquote className="text-gray-700 text-lg">
+                    `{features[currentIndex].content}`
+                  </blockquote>
+                  
+                  <div className="mt-4 flex items-center">
+                    <div className="bg-gray-100 rounded-full h-8 w-8 flex items-center justify-center mr-3">
+                      <span className="font-bold text-sm text-teal-700">RM</span>
+                    </div>
+                    <span className="text-sm font-semibold text-gray-900">{features[currentIndex].role}</span>
+                  </div>
+
+                 
+                </div>
+              </div>
+              
+              {/* Progress Bar */}
+              <div className="h-2 bg-gray-100 overflow-hidden">
+                <motion.div
+                  key={`progress-${currentIndex}`}
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 5, ease: "linear" }}
+                  className={`h-full bg-gradient-to-r ${features[currentIndex].color}`}
+                />
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Navigation Buttons with improved styling */}
+          <button
+            onClick={prevSlide}
+            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/90 shadow-lg hover:bg-white transition-all duration-300 border border-gray-100 z-10"
+            aria-label="Previous feature"
+          >
+            <ChevronLeft className="h-6 w-6 text-teal-700" />
+          </button>
+          <button
+            onClick={nextSlide}
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/90 shadow-lg hover:bg-white transition-all duration-300 border border-gray-100 z-10"
+            aria-label="Next feature"
+          >
+            <ChevronRight className="h-6 w-6 text-teal-700" />
+          </button>
+        </div>
+
+        {/* Enhanced Slide Indicators */}
+        <div className="flex justify-center mt-8 space-x-2">
+          {features.map((feature, index) => (
+            <motion.button
+              key={index}
+              className={`h-2 rounded-full cursor-pointer transition-all duration-300 ${
+                index === currentIndex 
+                  ? `w-10 bg-gradient-to-r ${feature.color}`
+                  : "w-3 bg-gray-300"
+              }`}
+              whileHover={{ scale: 1.2 }}
+              onClick={() => setCurrentIndex(index)}
+              aria-label={`Go to feature ${index + 1}: ${feature.name}`}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default FeatureSlider;

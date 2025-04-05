@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Chatbot from "@/components/Chatbot";
 import { X } from "lucide-react"
-import Bot from "@/components/Avatar"
+import Bot from "@/components/Acon"
 
 export default function ChatButton() {
     const [isChatbotOpen, setIsChatbotOpen] = useState(false);

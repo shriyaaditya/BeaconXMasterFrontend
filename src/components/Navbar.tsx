@@ -39,10 +39,10 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`relative w-full z-50 transition-all duration-300 ${
+      className={`relative w-full z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-gradient-to-r from-teal-800 to-teal-400 backdrop-blur-sm shadow-lg"
-          : "bg-gradient-to-r from-teal-800 to-teal-400 backdrop-blur-sm"
+          ? "bg-gradient-to-r from-teal-900 to-teal-700 backdrop-blur-md shadow-xl shadow-teal-900/20"
+          : "bg-gradient-to-r from-teal-800 to-teal-600 backdrop-blur-sm"
       }`}
     >
       <div className="max-w-7xl mx-auto px-6">
@@ -106,7 +106,7 @@ export default function Navbar() {
                 </svg>
               </div>
               <div className="font-bold text-2xl text-white transition-all duration-300 group-hover:text-sky-100">
-                Beacon<span className="text-teal-200">X</span>
+                Beacon<span className="text-teal-200 group-hover:text-teal-300 transition-colors duration-300">X</span>
               </div>
             </Link>
           </div>
@@ -120,8 +120,8 @@ export default function Navbar() {
                   <Link
                     key={link.name}
                     href={link.path}
-                    className={`flex items-center space-x-2 mx-1 px-2 py-2.5 rounded-md
-                      transition-all duration-300 text-white/80 hover:text-white
+                    className={`flex items-center space-x-2 mx-1 px-4 py-2.5 rounded-md
+                      transition-all duration-300 text-white/90 hover:text-white
                       relative group overflow-hidden ${isActive ? "bg-white/15 text-white" : ""}`}
                   >
                     <span className="relative z-10 transition-transform group-hover:scale-110 duration-300">
@@ -129,13 +129,11 @@ export default function Navbar() {
                     </span>
                     <span className="relative z-10 font-medium">{link.name}</span>
 
-                    {/* Hover background effect (only show if not active) */}
-                    {!isActive && (
-                      <span
-                        className="absolute inset-0 bg-white/0 group-hover:bg-white/15 
-                        transition-all duration-300 transform translate-y-full group-hover:translate-y-0 rounded-md"
-                      ></span>
-                    )}
+                    {/* Traveling line effect - left to right on hover */}
+                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-teal-300 transform scale-x-0 origin-left 
+                      transition-transform duration-500 group-hover:scale-x-100">
+                    </span>
+                    
                   </Link>
                 )
               })}
@@ -148,40 +146,38 @@ export default function Navbar() {
               {!user ? (
                 <Link
                   href="/login"
-                  className="flex items-center space-x-2 px-4 py-2.5 rounded-md 
-                    bg-teal-600 text-white relative group overflow-hidden
-                    transition-all duration-300 shadow-lg shadow-sky-500/20"
-                  aria-label="Register"
+                  className="flex items-center space-x-2 px-5 py-2.5 rounded-md 
+                    bg-gradient-to-r from-teal-600 to-teal-500 text-white relative group overflow-hidden
+                    transition-all duration-300 shadow-lg shadow-teal-500/20 hover:shadow-teal-400/30"
+                  aria-label="Login"
                 >
                   <span className="relative z-10 transition-transform group-hover:scale-110 duration-300">
                     <UserPlus className="h-5 w-5" />
                   </span>
                   <span className="relative z-10">Login</span>
 
-                  {/* Hover background effect */}
-                  <span
-                    className="absolute inset-0 bg-sky-400/0 group-hover:bg-teal-500 
-                    transition-all duration-300 transform translate-y-full group-hover:translate-y-0 rounded-md"
-                  ></span>
+                  {/* Traveling line effect */}
+                  <span className="absolute bottom-0 left-0 w-full h-full bg-gradient-to-r from-teal-400 to-teal-300
+                    transform translate-x-[-100%] group-hover:translate-x-0
+                    transition-transform duration-500 opacity-30"></span>
                 </Link>
               ) : (
                 <button
                   onClick={logout}
-                  className="flex items-center space-x-2 px-4 py-2.5 rounded-md
-                  transition-all duration-300 bg-teal-800 hover:text-white
-                  border border-white/20 hover:border-teal-600 relative group overflow-hidden"
-                  aria-label="Login"
+                  className="flex items-center space-x-2 px-5 py-2.5 rounded-md 
+                    bg-gradient-to-r from-teal-600 to-teal-500 text-white relative group overflow-hidden
+                    transition-all duration-300 shadow-lg shadow-teal-500/20 hover:shadow-teal-400/30"
+                  aria-label="Logout"
                   >
                   <span className="relative z-10 transition-transform group-hover:scale-110 duration-300">
                     <LogOut className="h-5 w-5" />
                   </span>
-                  <span className="relative z-10">LogOut</span>
+                  <span className="relative z-10">Logout</span>
 
-                  {/* Hover background effect */}
-                  <span
-                      className="absolute inset-0 bg-white/0 group-hover:bg-teal-600
-                      transition-all duration-300 transform translate-y-full group-hover:translate-y-0 rounded-md"
-                  ></span>
+                  {/* Traveling line effect */}
+                  <span className="absolute bottom-0 left-0 w-full h-full bg-gradient-to-r from-teal-400 to-teal-300
+                    transform translate-x-[-100%] group-hover:translate-x-0
+                    transition-transform duration-500 opacity-30"></span>
                 </button>
               )}
             </div>
@@ -191,22 +187,25 @@ export default function Navbar() {
           <div className="md:hidden flex items-center justify-end flex-1">
             <button
               className="p-2 rounded-lg transition-colors duration-300
-                hover:bg-white/10 focus:outline-none"
+                hover:bg-white/10 focus:outline-none relative overflow-hidden group"
               onClick={() => setIsOpen(!isOpen)}
               aria-label="Toggle menu"
             >
               {isOpen ? (
-                <X className="h-7 w-7 transition-transform duration-300" />
+                <X className="h-7 w-7 transition-transform duration-300 text-white" />
               ) : (
-                <Menu className="h-7 w-7 transition-transform duration-300" />
+                <Menu className="h-7 w-7 transition-transform duration-300 text-white" />
               )}
+              {/* Button hover effect */}
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-teal-300 transform scale-x-0 
+                transition-transform duration-300 group-hover:scale-x-100"></span>
             </button>
           </div>
         </div>
 
         {/* Mobile Navigation */}
         <div
-          className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+          className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out ${
             isOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
@@ -220,14 +219,18 @@ export default function Navbar() {
                     key={link.name}
                     href={link.path}
                     className={`flex items-center space-x-3 px-4 py-3.5 rounded-md 
-                      transition-all duration-300 hover:bg-white/15 group
-                      ${isActive ? "bg-white/15 text-white" : ""}`}
+                      transition-all duration-500 hover:bg-white/15 group relative overflow-hidden
+                      ${isActive ? "bg-gradient-to-r from-teal-600/30 to-teal-500/30 text-white" : ""}`}
                     onClick={() => setIsOpen(false)}
                   >
-                    <span className="text-white/80 transition-transform group-hover:scale-110 duration-300">
+                    <span className="text-white/90 transition-transform group-hover:scale-110 duration-300">
                       {link.icon}
                     </span>
                     <span className="font-medium">{link.name}</span>
+                    
+                    {/* Traveling line effect for mobile links */}
+                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-teal-300 transform scale-x-0 
+                      transition-transform duration-500 group-hover:scale-x-100"></span>
                   </Link>
                 )
               })}
@@ -240,11 +243,17 @@ export default function Navbar() {
             <Link
               href="/login"
               className="flex-1 flex items-center justify-center space-x-2 py-3 rounded-lg 
-                border border-white/20 transition-all duration-300 hover:bg-white/10"
+                bg-gradient-to-r from-teal-600/50 to-teal-500/50
+                border border-white/20 transition-all duration-300 hover:bg-white/10
+                group relative overflow-hidden"
               onClick={() => setIsOpen(false)}
             >
-              <UserPlus className="h-5 w-5" />
+              <UserPlus className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
               <span>Login</span>
+              
+              {/* Traveling line effect */}
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-teal-300 transform scale-x-0 
+                transition-transform duration-500 group-hover:scale-x-100"></span>
             </Link>
           ) : (
             <button
@@ -253,10 +262,16 @@ export default function Navbar() {
                 setIsOpen(false);
               }}
               className="flex-1 flex items-center justify-center space-x-2 py-3 rounded-lg 
-                border border-white/20 transition-all duration-300 hover:bg-white/10"
+                bg-gradient-to-r from-teal-600/50 to-teal-500/50
+                border border-white/20 transition-all duration-300 hover:bg-white/10
+                group relative overflow-hidden"
             >
-              <LogOut className="h-5 w-5" />
+              <LogOut className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
               <span>Logout</span>
+              
+              {/* Traveling line effect */}
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-teal-300 transform scale-x-0 
+                transition-transform duration-500 group-hover:scale-x-100"></span>
             </button>
           )}
           </div>
@@ -265,4 +280,3 @@ export default function Navbar() {
     </nav>
   )
 }
-

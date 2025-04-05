@@ -6,24 +6,10 @@ import { AlertCircle, MapPin, Navigation, Loader } from "lucide-react"
 import GoogleMapBox from "@/components/GoogleMapBox"
 
 export default function HeroSection() {
-  const [topAlertIndex, setTopAlertIndex] = useState(0)
-  const [bottomAlertIndex, setBottomAlertIndex] = useState(0)
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [locationError, setLocationError] = useState<string | null>(null)
   const [isLoadingLocation, setIsLoadingLocation] = useState(false)
   
-
-  const topAlerts = [
-    "ALERT: Heavy rainfall expected in coastal areas. Stay prepared.",
-    "UPDATE: Evacuation routes have been updated for northern districts.",
-    "WARNING: High winds forecasted for tomorrow. Secure loose items.",
-  ]
-
-  const bottomAlerts = [
-    "RESOURCES: Emergency supply kits available at community centers.",
-    "SHELTER: Temporary shelters open at Lincoln High and Central Stadium.",
-    "MEDICAL: Mobile clinics deployed to affected neighborhoods.",
-  ]
 
   const getLocation = () => {
     if (typeof navigator === "undefined") return
@@ -53,45 +39,12 @@ export default function HeroSection() {
     }
   }, [])
 
-  useEffect(() => {
-    let topInterval: NodeJS.Timeout
-    let bottomInterval: NodeJS.Timeout
-
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    
-    if (!reducedMotion) {
-      topInterval = setInterval(() => {
-        setTopAlertIndex((prev) => (prev + 1) % topAlerts.length)
-      }, 5000)
-
-      bottomInterval = setInterval(() => {
-        setBottomAlertIndex((prev) => (prev + 1) % bottomAlerts.length)
-      }, 5000)
-    }
-
-    return () => {
-      clearInterval(topInterval)
-      clearInterval(bottomInterval)
-    }
-  }, [topAlerts.length, bottomAlerts.length])
 
   return (
     <div className="w-screen overflow-hidden relative">
-      {/* Top Alert Banner */}
-      <div 
-        className="bg-amber-700 text-white py-2 relative overflow-hidden"
-        aria-live="polite"
-        aria-atomic="true"
-      >
-        <div className="flex items-center justify-center animate-marquee whitespace-nowrap">
-          <AlertCircle className="h-4 w-4 mr-2 shrink-0" />
-          <p className="text-sm font-medium truncate">{topAlerts[topAlertIndex]}</p>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="bg-gradient-to-br from-teal-100 to-teal-300">
-        <div className="container mx-auto px-4 py- md:py-24 relative z-10">
+      
+      <div className="bg-teal-100">
+        <div className="container mx-auto px-4 md:py-16 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
             <div className="space-y-6 animate-fade-in">
@@ -126,7 +79,7 @@ export default function HeroSection() {
 
             {/* Map Section */}
             <div className="rounded-xl overflow-hidden shadow-2xl h-[300px] md:h-[400px]">
-              <div className="p-4 bg-teal-700 flex items-center justify-between">
+              <div className="p-3 bg-teal-700 flex items-center justify-between">
                 <h3 className="font-semibold text-white flex items-center">
                   <Navigation className="h-4 w-4 mr-2" />
                   Your Current Location
@@ -173,7 +126,7 @@ export default function HeroSection() {
 
           {/* Safety Status */}
           <div className="mt-8 rounded-lg p-4 max-w-3xl mx-auto">
-            <h3 className="text-teal-800 font-medium mb-2">Your Area Safety Status</h3>
+            <h3 className="text-teal-800 font-bold mb-2">Your Area Safety Status</h3>
             <div className="h-2 bg-teal-900 rounded-full overflow-hidden">
               <div className="h-full bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 w-3/4" />
             </div>
@@ -186,17 +139,6 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Bottom Alert Banner */}
-      <div 
-        className="bg-red-700 text-white py-2 relative overflow-hidden"
-        aria-live="polite"
-        aria-atomic="true"
-      >
-        <div className="flex items-center justify-center animate-marquee whitespace-nowrap">
-          <AlertCircle className="h-4 w-4 mr-2 shrink-0" />
-          <p className="text-sm font-medium truncate">{bottomAlerts[bottomAlertIndex]}</p>
-        </div>
-      </div>
     </div>
   )
 }

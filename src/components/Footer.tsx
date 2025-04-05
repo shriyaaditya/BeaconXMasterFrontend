@@ -35,7 +35,7 @@ export default function Footer() {
         </div>
       </div>
       
-      {/* Wave Divider */}
+      {/* Wave Divider
       <div className="absolute top-0 left-0 w-full overflow-hidden leading-none">
         <svg 
           className="relative block w-full h-12 md:h-16" 
@@ -44,10 +44,10 @@ export default function Footer() {
         >
           <path 
             d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" 
-            className="fill-teal-50"
+            className="fill-teal-800"
           />
         </svg>
-      </div>
+      </div> */}
       
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-10 pt-10 pb-2 relative z-10">
@@ -64,8 +64,7 @@ export default function Footer() {
                 </div>
                 <span className="text-2xl font-bold tracking-tight text-white">Beacon<span className="text-teal-300">X</span></span>
               </div>
-            </Link>
-            
+            </Link>       
            
             
         
@@ -76,14 +75,20 @@ export default function Footer() {
           
           <div className="space-y-6 pt-10">
             <ul className="space-y-3">
-              {['About Us', 'Inventory', 'Community', 'Alerts', 'Survival Guide'].map((item) => (
-                <li key={item}>
+              {[
+                { name: 'About Us', path: '/about' },
+                { name: 'Inventory', path: '/inventory' },
+                { name: 'Community', path: '/community' },
+                { name: 'Alerts', path: '/alerts' },
+                { name: 'Survival Guide', path: '/guide' }
+              ].map((item) => (
+                <li key={item.name}>
                   <Link 
-                    href="#" 
+                    href={item.path}
                     className="text-teal-200 hover:text-white transition-colors duration-200 flex items-center group"
                   >
                     <span className="w-1.5 h-1.5 bg-teal-500 rounded-full mr-2 transform scale-0 group-hover:scale-100 transition-transform duration-200"></span>
-                    {item}
+                    {item.name}
                   </Link>
                 </li>
               ))}
@@ -136,8 +141,6 @@ export default function Footer() {
         </div>
       </div>
       
-      {/* Bottom Accent */}
-      <div className="h-1.5 bg-gradient-to-r from-teal-600 via-teal-400 to-teal-600"></div>
     </footer>
   );
 }
