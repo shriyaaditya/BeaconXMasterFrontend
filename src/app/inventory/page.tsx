@@ -9,12 +9,12 @@ import {
   LineElement,
   PointElement,
   ArcElement,
-  RadialLinearScale,
   Tooltip,
-  Legend,
+  TooltipItem,
+  Legend
 } from "chart.js"
-import { Bar, Line, Doughnut, Radar } from "react-chartjs-2"
-import * as XLSX from "xlsx"
+import { Bar, Line, Doughnut } from "react-chartjs-2"
+import EarthquakePage from "@/components/EarthquakePage"
 
 // Register ChartJS components
 Chart.register(
@@ -24,10 +24,17 @@ Chart.register(
   LineElement,
   PointElement,
   ArcElement,
-  RadialLinearScale,
   Tooltip,
   Legend,
 )
+
+// Disaster severity levels
+const DISASTER_SEVERITY = {
+  LOW: { level: 1, label: "Mild", color: "bg-green-500" },
+  MODERATE: { level: 2, label: "Moderate", color: "bg-yellow-500" },
+  HIGH: { level: 3, label: "High", color: "bg-orange-500" },
+  EXTREME: { level: 4, label: "Catastrophic", color: "bg-red-500" },
+}
 
 // Category icons mapping
 const categoryIcons = {
@@ -47,6 +54,7 @@ interface InventoryItem {
   min: number
   reorder: number
   max: number
+  depletionRate?: number // Added for dynamic depletion based on severity
 }
 
 interface CategoryData {
@@ -63,6 +71,7 @@ interface CurrentInventoryItem {
   current: number
   percentage: number
   status: "critical" | "warning" | "optimal"
+  depletionRate: number
 }
 
 interface CurrentInventory {
@@ -71,62 +80,115 @@ interface CurrentInventory {
   }
 }
 
-// Function to parse Excel data
-const parseExcelData = (data: any[]): InventoryData => {
+interface AllocationRecommendation {
+  item: string
+  current: number
+  recommended: number
+  reason: string
+  priority: "high" | "medium" | "low"
+}
+
+// Function to fetch data from Google Sheets using the API route
+const fetchGoogleSheetData = async () => {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
+                   (typeof window !== 'undefined' ? window.location.origin : '');
+    const response = await fetch(`${baseUrl}/api/sheets`, {
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Fetch error:", error);
+    throw error;
+  }
+};
+
+// Function to fetch disaster severity from ML model
+const fetchDisasterSeverity = async (): Promise<number> => {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
+                   (typeof window !== 'undefined' ? window.location.origin : '');
+    const response = await fetch(`${baseUrl}/api/ml-model`, {
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.severityLevel || 1; // Default to low severity if not provided
+  } catch (error) {
+    console.error("Error fetching disaster severity:", error);
+    return 1; // Default to low severity on error
+  }
+};
+
+// Function to parse Google Sheets data
+const parseSheetData = (data: string[][], severityLevel: number): InventoryData => {
   const result: InventoryData = {}
+  
+  // Skip header row and process data
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i]
+    const category = row[0]
+    const item = row[1]
 
-  data.forEach((row) => {
-    const category = row.Category
-    const item = row.Item
+    if (!category || !item) continue
 
-    if (!category || !item) return
-
-    const categoryKey = category.replace(/[^a-zA-Z0-9]/g, "");
+    const categoryKey = category.replace(/[^a-zA-Z0-9]/g, "")
 
     if (!result[categoryKey]) {
       result[categoryKey] = {
         title: category,
         icon: categoryIcons[category as keyof typeof categoryIcons] || "📦",
         items: [],
-      };
-    }
-    
-
-    // Parse numeric values, handling different formats
-    const per1000Value = row["Per 1,000 People"]
-    let per1000 = 0
-
-    if (typeof per1000Value === "number") {
-      per1000 = per1000Value
-    } else if (typeof per1000Value === "string") {
-      // Extract numeric part from strings like "500 units" or "5 liters/day/person"
-      const match = per1000Value.match(/^([\d,]+)/)
-      if (match) {
-        per1000 = Number.parseFloat(match[1].replace(/,/g, ""))
       }
     }
 
+    // Parse numeric values from columns
+    const per1000 = parseFloat(row[2] || "0")
+    const min = parseFloat(row[3] || "0")
+    const reorder = parseFloat(row[4] || "0")
+    const max = parseFloat(row[5] || "0")
+    
+    // Calculate depletion rate based on severity (higher severity = faster depletion)
+    // Base depletion rate is 1-5% per day, multiplied by severity factor
+    const baseDepletionRate = 0.01 + (Math.random() * 0.04); // 1-5%
+    const severityFactor = 0.5 + (severityLevel * 0.5); // 1x for low, 2.5x for extreme
+    const depletionRate = baseDepletionRate * severityFactor;
+
     result[categoryKey].items.push({
       name: item,
-      per1000: per1000,
-      min: Number.parseFloat(row["Minimum Level"]),
-      reorder: Number.parseFloat(row["Reorder Level"]),
-      max: Number.parseFloat(row["Maximum Level"]),
+      per1000,
+      min,
+      reorder,
+      max,
+      depletionRate,
     })
-  })
+  }
 
   return result
 }
 
-// Generate mock current inventory levels (random values between min and max)
-const generateCurrentInventory = (inventoryData: InventoryData): CurrentInventory => {
+// Generate current inventory levels with severity-based depletion
+const generateCurrentInventory = (inventoryData: InventoryData, severityLevel: number): CurrentInventory => {
   const result: CurrentInventory = {}
 
   Object.keys(inventoryData).forEach((category) => {
     result[category] = {}
     inventoryData[category].items.forEach((item) => {
       // Generate a random value between min and max
-      const current = Math.floor(Math.random() * (item.max - item.min) + item.min)
+      let current = Math.floor(Math.random() * (item.max - item.min) + item.min)
+      
+      // Adjust based on severity - more severe = lower starting inventory
+      current = Math.max(item.min, current * (1 - (severityLevel * 0.1)))
 
       // Calculate percentage of max
       const percentage = Math.round((current / item.max) * 100)
@@ -139,11 +201,80 @@ const generateCurrentInventory = (inventoryData: InventoryData): CurrentInventor
         status = "warning"
       }
 
-      result[category][item.name] = { current, percentage, status }
+      result[category][item.name] = { 
+        current, 
+        percentage, 
+        status,
+        depletionRate: item.depletionRate || 0.02 // Default 2% if not set
+      }
     })
   })
 
   return result
+}
+
+// Generate allocation recommendations based on trends and severity
+const generateAllocationRecommendations = (
+  inventoryData: InventoryData,
+  currentInventory: CurrentInventory,
+  selectedCategory: string,
+  severityLevel: number
+): AllocationRecommendation[] => {
+  if (!selectedCategory || !inventoryData[selectedCategory]) return []
+
+  const recommendations: AllocationRecommendation[] = []
+  const categoryItems = inventoryData[selectedCategory].items
+
+  categoryItems.forEach((item) => {
+    const current = currentInventory[selectedCategory]?.[item.name]?.current || 0
+    const status = currentInventory[selectedCategory]?.[item.name]?.status || "optimal"
+    const depletionRate = currentInventory[selectedCategory]?.[item.name]?.depletionRate || 0.02
+
+    // Base recommendation logic
+    let recommended = current
+    let reason = "No change needed"
+    let priority: "high" | "medium" | "low" = "low"
+
+    // Calculate projected depletion based on severity
+    const daysUntilCritical = status === "critical" ? 0 : 
+      Math.floor((current - item.min) / (current * depletionRate))
+    
+    // Adjust recommendations based on severity
+    const severityMultiplier = 1 + (severityLevel * 0.5) // 1.5x for low, 3x for extreme
+
+    if (status === "critical") {
+      recommended = Math.min(item.max, Math.ceil(item.max * 0.8 * severityMultiplier))
+      reason = `Critical levels - urgent replenishment needed (projected to last ${daysUntilCritical} days)`
+      priority = "high"
+    } else if (status === "warning") {
+      recommended = Math.min(item.max, Math.ceil(item.reorder * 1.5 * severityMultiplier))
+      reason = `Warning levels - recommend increased allocation (projected to last ${daysUntilCritical} days)`
+      priority = daysUntilCritical < 3 ? "high" : "medium"
+    } else if (current < item.max * 0.8) {
+      // For optimal items, increase recommendation based on severity
+      const severityAdjustment = 1 + (severityLevel * 0.1) // 10% increase per severity level
+      recommended = Math.min(item.max, Math.ceil(current * 1.2 * severityAdjustment))
+      reason = `Below optimal levels - increase recommended due to disaster severity ${severityLevel}`
+      priority = daysUntilCritical < 7 ? "medium" : "low"
+    }
+
+    // Ensure we're not recommending less than current
+    recommended = Math.max(recommended, current)
+
+    recommendations.push({
+      item: item.name,
+      current,
+      recommended,
+      reason,
+      priority
+    })
+  })
+
+  // Sort by priority (high to low)
+  return recommendations.sort((a, b) => {
+    const priorityOrder = { high: 3, medium: 2, low: 1 }
+    return priorityOrder[b.priority] - priorityOrder[a.priority]
+  })
 }
 
 export default function Home() {
@@ -153,65 +284,124 @@ export default function Home() {
   const [timeRange, setTimeRange] = useState<string>("week")
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
+  const [allocationRecs, setAllocationRecs] = useState<AllocationRecommendation[]>([])
+  const [isAllocating, setIsAllocating] = useState<boolean>(false)
+  const [lastUpdated, setLastUpdated] = useState<string>("")
+  const [disasterSeverity, setDisasterSeverity] = useState<number>(1)
   const lineChartRef = useRef(null)
 
-  // Load XLSX data
+  // Load Google Sheets data and disaster severity
   useEffect(() => {
-    const loadXLSXData = async () => {
+    const loadData = async () => {
       try {
-        setIsLoading(true)
-        setError(null)
+        setIsLoading(true);
+        setError(null);
 
-        const response = await fetch("/Disaster_Inventory.xlsx")
+        // Fetch disaster severity first
+        const severity = await fetchDisasterSeverity();
+        setDisasterSeverity(severity);
 
-        if (!response.ok) {
-          throw new Error(`Failed to load XLSX file: ${response.status} ${response.statusText}`)
+        // Then fetch inventory data with severity context
+        const fetchedData = await fetchGoogleSheetData();
+        if (!fetchedData || !fetchedData.values || fetchedData.values.length === 0) {
+          throw new Error("No data received from Google Sheets API");
         }
 
-        const arrayBuffer = await response.arrayBuffer()
-        const data = new Uint8Array(arrayBuffer)
-        const workbook = XLSX.read(data, { type: "array" })
+        const parsedData = parseSheetData(fetchedData.values, severity);
+        setInventoryData(parsedData);
 
-        // Get first sheet
-        const firstSheetName = workbook.SheetNames[0]
-        const worksheet = workbook.Sheets[firstSheetName]
-
-        // Convert to JSON
-        const jsonData = XLSX.utils.sheet_to_json(worksheet)
-
-        // Parse the data
-        const parsedData = parseExcelData(jsonData)
-
-        setInventoryData(parsedData)
-
-        // Select the first category
+        // Select the first category (if available)
         if (Object.keys(parsedData).length > 0) {
-          setSelectedCategory(Object.keys(parsedData)[0])
+          setSelectedCategory(Object.keys(parsedData)[0]);
         }
 
-        // Generate current inventory levels
-        setCurrentInventory(generateCurrentInventory(parsedData))
+        // Generate current inventory levels with severity context
+        setCurrentInventory(generateCurrentInventory(parsedData, severity));
       } catch (err) {
-        console.error("Error loading XLSX data:", err)
-        setError("Failed to load inventory data. Please check if the XLSX file exists and is accessible.")
-
-        // Load fallback data if XLSX fails
+        console.error("Error loading data:", err);
+        setError("Failed to load inventory data.");
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
+    };
+
+    loadData();
+  }, []);
+
+  // Update allocation recommendations when category or severity changes
+  useEffect(() => {
+    if (selectedCategory && Object.keys(currentInventory).length > 0) {
+      setAllocationRecs(
+        generateAllocationRecommendations(
+          inventoryData, 
+          currentInventory, 
+          selectedCategory,
+          disasterSeverity
+        )
+      )
     }
-
-    loadXLSXData()
-  }, [])
-
-  // Load fallback data if XLSX fails
+  }, [selectedCategory, currentInventory, inventoryData, disasterSeverity])
 
   // Refresh inventory data
-  const refreshInventory = () => {
-    setCurrentInventory(generateCurrentInventory(inventoryData))
+  const refreshInventory = async () => {
+    try {
+      setIsLoading(true)
+      const severity = await fetchDisasterSeverity()
+      setDisasterSeverity(severity)
+      
+      const sheetData = await fetchGoogleSheetData()
+      const parsedData = parseSheetData(sheetData, severity)
+      
+      setInventoryData(parsedData)
+      setLastUpdated(new Date().toLocaleString())
+      
+      const currentInv = generateCurrentInventory(parsedData, severity)
+      setCurrentInventory(currentInv)
+    } catch (err) {
+      console.error("Error refreshing data:", err)
+      setError("Failed to refresh data. Please try again.")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  // Generate line chart data for inventory trends
+  // Handle allocation action
+  const handleAllocate = () => {
+    setIsAllocating(true)
+    
+    // Simulate allocation process
+    setTimeout(() => {
+      // Update inventory with recommended values
+      const updatedInventory = { ...currentInventory }
+      
+      allocationRecs.forEach(rec => {
+        if (updatedInventory[selectedCategory] && updatedInventory[selectedCategory][rec.item]) {
+          updatedInventory[selectedCategory][rec.item].current = rec.recommended
+          
+          // Update status based on new value
+          const itemSpec = inventoryData[selectedCategory].items.find(i => i.name === rec.item)
+          if (itemSpec) {
+            let status: "critical" | "warning" | "optimal" = "optimal"
+            if (rec.recommended <= itemSpec.min) {
+              status = "critical"
+            } else if (rec.recommended <= itemSpec.reorder) {
+              status = "warning"
+            }
+            updatedInventory[selectedCategory][rec.item].status = status
+            updatedInventory[selectedCategory][rec.item].percentage = Math.round((rec.recommended / itemSpec.max) * 100)
+          }
+        }
+      })
+      
+      setCurrentInventory(updatedInventory)
+      setIsAllocating(false)
+      
+      // Show success message
+      alert("Resource allocation request has been sent successfully based on recommendations!")
+    }, 1500)
+  }
+
+  // Generate line chart data for inventory trends with severity impact
   const getLineChartData = () => {
     if (!selectedCategory || !inventoryData[selectedCategory]) {
       return { labels: [], datasets: [] }
@@ -220,15 +410,21 @@ export default function Home() {
     const labels = ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"]
 
     const datasets = inventoryData[selectedCategory].items.map((item, index) => {
-      // Generate random data points that trend downward
-      const data = Array(7).fill(null).map((_, i) => { 
+      // Generate data points that trend downward based on depletion rate and severity
+      const baseDepletionRate = item.depletionRate || 0.02
+      const severityImpact = 1 + (disasterSeverity * 0.3) // 30% increase per severity level
+      const effectiveDepletionRate = baseDepletionRate * severityImpact
 
-        
-          const max = item.max
-          const min = item.min
-          const randomFactor = Math.random() * 0.2 + 0.9 - i * 0.05
-          return Math.floor((max - min) * randomFactor + min)
-        })
+      // Start from a random point between min and max
+      const startValue = Math.floor(
+        Math.random() * (item.max - item.min) + item.min * (1 - (disasterSeverity * 0.1)))
+      
+      const data = Array(7).fill(null).map((_, i) => {
+        // Calculate depletion with some randomness
+        const randomFactor = 0.9 + Math.random() * 0.2
+        const depletedValue = startValue * Math.pow(1 - effectiveDepletionRate * randomFactor, i)
+        return Math.max(item.min, Math.floor(depletedValue))
+      })
 
       return {
         label: item.name,
@@ -325,44 +521,6 @@ export default function Home() {
     }
   }
 
-  // Generate radar chart data for category coverage
-  const getRadarData = () => {
-    if (!Object.keys(currentInventory).length) {
-      return { labels: [], datasets: [] }
-    }
-
-    const labels = Object.keys(inventoryData).map((key) => inventoryData[key].title)
-
-    // Calculate average percentage for each category
-    const data = Object.keys(inventoryData).map((category) => {
-      const items = Object.keys(currentInventory[category] || {})
-      if (items.length === 0) return 0
-
-      const sum = items.reduce((acc, item) => {
-        return acc + (currentInventory[category][item]?.percentage || 0)
-      }, 0)
-
-      return Math.round(sum / items.length)
-    })
-
-    return {
-      labels,
-      datasets: [
-        {
-          label: "Coverage %",
-          data,
-          backgroundColor: "rgba(45, 212, 191, 0.2)",
-          borderColor: "rgba(45, 212, 191, 1)",
-          borderWidth: 2,
-          pointBackgroundColor: "rgba(45, 212, 191, 1)",
-          pointBorderColor: "#fff",
-          pointHoverBackgroundColor: "#fff",
-          pointHoverBorderColor: "rgba(45, 212, 191, 1)",
-        },
-      ],
-    }
-  }
-
   // Chart options
   const lineOptions = {
     responsive: true,
@@ -377,6 +535,18 @@ export default function Home() {
       tooltip: {
         mode: "index" as const,
         intersect: false,
+        callbacks: {
+          label: (context: TooltipItem<'line'>) => {
+            const label = context.dataset.label || ''
+            const value = context.parsed.y || 0
+            if (!selectedCategory || !inventoryData[selectedCategory]) {
+              return `${label}: ${value}`;
+            }
+            const item = inventoryData[selectedCategory]?.items.find((i: InventoryItem) => i.name === label)
+            const percentage = item ? Math.round((value / item.max) * 100) : 0
+            return `${label}: ${value} (${percentage}% of max)`
+          }
+        }
       },
     },
     scales: {
@@ -445,43 +615,30 @@ export default function Home() {
     },
   }
 
-  const radarOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "top" as const,
-        labels: {
-          color: "rgba(255, 255, 255, 0.8)",
-        },
-      },
-    },
-    scales: {
-      r: {
-        angleLines: {
-          color: "rgba(255, 255, 255, 0.2)",
-        },
-        grid: {
-          color: "rgba(255, 255, 255, 0.2)",
-        },
-        pointLabels: {
-          color: "rgba(255, 255, 255, 0.8)",
-        },
-        ticks: {
-          backdropColor: "transparent",
-          color: "rgba(255, 255, 255, 0.8)",
-        },
-      },
-    },
+  // Get severity display info
+  const getSeverityInfo = (level: number) => {
+    return Object.values(DISASTER_SEVERITY).find(s => s.level === level) || DISASTER_SEVERITY.LOW
   }
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
+      <EarthquakePage/>
       {/* Header */}
       <header className="bg-gray-800 p-4 shadow-lg">
-        <div className="container mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-teal-400">Emergency Supplies Dashboard</h1>
-          <div className="flex space-x-4">
+        <div className="container mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-teal-400">Emergency Supplies Dashboard</h1>
+            {lastUpdated && (
+              <p className="text-xs text-gray-400 mt-1">Last updated: {lastUpdated}</p>
+            )}
+          </div>
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center">
+              <span className="mr-2">Disaster Severity:</span>
+              <span className={`px-2 py-1 rounded-full text-xs font-bold ${getSeverityInfo(disasterSeverity).color}`}>
+                {getSeverityInfo(disasterSeverity).label}
+              </span>
+            </div>
             <select
               className="bg-gray-700 text-white px-3 py-1 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-teal-500"
               value={timeRange}
@@ -492,14 +649,14 @@ export default function Home() {
               <option value="month">Last 30 Days</option>
             </select>
             <button
-              className="bg-teal-500 hover:bg-teal-600 px-4 py-1 rounded"
+              className="bg-teal-500 hover:bg-teal-600 px-4 py-1 rounded flex items-center gap-2"
               onClick={refreshInventory}
               disabled={isLoading}
             >
               {isLoading ? (
-                <span className="flex items-center">
+                <>
                   <svg
-                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    className="animate-spin h-4 w-4 text-white"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -519,9 +676,14 @@ export default function Home() {
                     ></path>
                   </svg>
                   Loading
-                </span>
+                </>
               ) : (
-                "Refresh"
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Refresh
+                </>
               )}
             </button>
           </div>
@@ -529,7 +691,7 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto p-4">
+      <main className="containers p-4">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20 bg-gray-800 rounded-lg">
             <svg
@@ -549,7 +711,7 @@ export default function Home() {
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-20 bg-gray-800 rounded-lg">
-            <div className="bg-red-500/20 p-4 rounded-full mb-4">
+            <div className="bg-red-500/20 p-2 rounded-full mb-4">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-12 w-12 text-red-500"
@@ -567,7 +729,6 @@ export default function Home() {
             </div>
             <h2 className="text-xl font-semibold mb-2 text-red-500">Error Loading Data</h2>
             <p className="text-gray-400 mb-6 text-center max-w-md">{error}</p>
-            <p className="text-gray-400 mb-6 text-center max-w-md">Using fallback data instead.</p>
           </div>
         ) : (
           <>
@@ -590,7 +751,7 @@ export default function Home() {
             </div>
 
             {/* Charts Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 mx-1/2 gap-6">
               {/* Inventory Trend Line Chart */}
               <div className="bg-gray-800 rounded-lg p-4 shadow-lg">
                 <h2 className="text-xl font-semibold mb-4 text-teal-400">
@@ -600,7 +761,14 @@ export default function Home() {
                   - Inventory Trend
                 </h2>
                 <div className="h-80">
-                  <Line data={getLineChartData()} options={lineOptions} ref={lineChartRef} />
+                  <Line 
+                    data={getLineChartData()} 
+                    options={lineOptions} 
+                    ref={lineChartRef} 
+                  />
+                </div>
+                <div className="mt-2 text-sm text-gray-400">
+                  <p>Trends adjusted for disaster severity level {disasterSeverity} ({getSeverityInfo(disasterSeverity).label})</p>
                 </div>
               </div>
 
@@ -666,17 +834,112 @@ export default function Home() {
                             }, 0)}
                           </span>
                         </div>
+                        <div className="mt-4 p-2 bg-gray-700 rounded">
+                          <p className="text-sm">
+                            <span className="font-semibold">Disaster Severity Impact:</span> 
+                            <br />
+                            Higher severity increases depletion rates by {disasterSeverity * 30}% and allocation recommendations.
+                          </p>
+                        </div>
                       </>
                     )}
                   </div>
                 </div>
               </div>
 
-              {/* Category Coverage Radar Chart */}
+              {/* Resource Allocation */}
               <div className="bg-gray-800 rounded-lg p-4 shadow-lg">
-                <h2 className="text-xl font-semibold mb-4 text-teal-400">Category Coverage</h2>
-                <div className="h-64">
-                  <Radar data={getRadarData()} options={radarOptions} />
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-semibold text-teal-400">Resource Allocation</h2>
+                  <button
+                    onClick={handleAllocate}
+                    disabled={isAllocating || allocationRecs.length === 0}
+                    className={`px-4 py-2 rounded flex items-center gap-2 ${
+                      isAllocating || allocationRecs.length === 0
+                        ? "bg-gray-600 cursor-not-allowed"
+                        : "bg-teal-500 hover:bg-teal-600"
+                    }`}
+                  >
+                    {isAllocating ? (
+                      <>
+                        <svg
+                          className="animate-spin h-4 w-4 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        Allocating...
+                      </>
+                    ) : (
+                      <>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                        </svg>
+                        Allocate
+                      </>
+                    )}
+                  </button>
+                </div>
+                <div className="overflow-y-auto max-h-96">
+                  <table className="min-w-full bg-gray-900 rounded-lg overflow-hidden">
+                    <thead className="bg-gray-700 sticky top-0">
+                      <tr>
+                        <th className="py-2 px-4 text-left">Priority</th>
+                        <th className="py-2 px-4 text-left">Item</th>
+                        <th className="py-2 px-4 text-left">Current</th>
+                        <th className="py-2 px-4 text-left">Recommended</th>
+                        <th className="py-2 px-4 text-left">Reason</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {allocationRecs.map((rec, index) => {
+                        let priorityColor = "bg-gray-500"
+                        if (rec.priority === "high") priorityColor = "bg-red-500"
+                        else if (rec.priority === "medium") priorityColor = "bg-yellow-500"
+                        
+                        return (
+                          <tr key={index} className={index % 2 === 0 ? "bg-gray-800" : "bg-gray-900"}>
+                            <td className="py-2 px-4">
+                              <span className={`inline-block w-3 h-3 rounded-full ${priorityColor} mr-2`}></span>
+                              <span className="capitalize">{rec.priority}</span>
+                            </td>
+                            <td className="py-2 px-4">{rec.item}</td>
+                            <td className="py-2 px-4">{rec.current}</td>
+                            <td className="py-2 px-4">
+                              <span className={`font-bold ${
+                                rec.recommended > rec.current ? "text-green-400" : 
+                                rec.recommended < rec.current ? "text-yellow-400" : "text-gray-400"
+                              }`}>
+                                {rec.recommended}
+                              </span>
+                            </td>
+                            <td className="py-2 px-4 text-sm text-gray-300">{rec.reason}</td>
+                          </tr>
+                        )
+                      })}
+                      {allocationRecs.length === 0 && (
+                        <tr>
+                          <td colSpan={5} className="py-4 text-center text-gray-400">
+                            No allocation recommendations available
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
@@ -698,12 +961,14 @@ export default function Home() {
                         <th className="py-2 px-4 text-left">Reorder</th>
                         <th className="py-2 px-4 text-left">Maximum</th>
                         <th className="py-2 px-4 text-left">Status</th>
+                        <th className="py-2 px-4 text-left">Depletion Rate</th>
                       </tr>
                     </thead>
                     <tbody>
                       {inventoryData[selectedCategory].items.map((item, index) => {
                         const current = currentInventory[selectedCategory]?.[item.name]?.current || 0
                         const status = currentInventory[selectedCategory]?.[item.name]?.status || "unknown"
+                        const depletionRate = currentInventory[selectedCategory]?.[item.name]?.depletionRate || 0.02
 
                         let statusColor = "bg-gray-500"
                         if (status === "critical") statusColor = "bg-red-500"
@@ -724,6 +989,9 @@ export default function Home() {
                                 <span className="capitalize">{status}</span>
                               </div>
                             </td>
+                            <td className="py-2 px-4">
+                              {(depletionRate * 100).toFixed(1)}% per day
+                            </td>
                           </tr>
                         )
                       })}
@@ -735,8 +1003,6 @@ export default function Home() {
           </>
         )}
       </main>
-
     </div>
   )
 }
-
