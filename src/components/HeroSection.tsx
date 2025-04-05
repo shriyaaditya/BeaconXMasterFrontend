@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { AlertCircle, MapPin, Navigation, Loader } from "lucide-react"
+import GoogleMapBox from "@/components/GoogleMapBox"
 
 export default function HeroSection() {
   const [topAlertIndex, setTopAlertIndex] = useState(0)
@@ -90,7 +91,7 @@ export default function HeroSection() {
 
       {/* Main Content */}
       <div className="bg-gradient-to-br from-teal-100 to-teal-300">
-        <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
+        <div className="container mx-auto px-4 py- md:py-24 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
             <div className="space-y-6 animate-fade-in">
@@ -157,35 +158,7 @@ export default function HeroSection() {
                 ) : location ? (
                   <>
                     <div className="absolute inset-0 bg-teal-800/50 flex items-center justify-center">
-                      <div className="relative w-full h-full overflow-hidden">
-                        <div className="absolute inset-0 grid grid-cols-6 grid-rows-6">
-                          {[...Array(6)].map((_, i) => (
-                            <div
-                              key={`col-${i}`}
-                              className="border-r border-teal-600/30 h-full"
-                            />
-                          ))}
-                          {[...Array(6)].map((_, i) => (
-                            <div
-                              key={`row-${i}`}
-                              className="border-b border-teal-600/30 w-full"
-                            />
-                          ))}
-                        </div>
-
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                          <div className="relative">
-                            <div className="h-6 w-6 bg-red-500 rounded-full flex items-center justify-center z-10 animate-pulse">
-                              <div className="h-3 w-3 bg-white rounded-full" />
-                            </div>
-                            <div className="absolute -inset-4 border-2 border-red-500/50 rounded-full animate-ping" />
-                          </div>
-                        </div>
-
-                        <div className="absolute top-1/4 left-1/3 h-4 w-4 bg-green-400 rounded-full" />
-                        <div className="absolute bottom-1/3 right-1/4 h-4 w-4 bg-green-400 rounded-full" />
-                        <div className="absolute top-2/3 right-1/3 h-4 w-4 bg-green-400 rounded-full" />
-                      </div>
+                    <GoogleMapBox center={location} zoom={6} mapTypeId="roadmap" />
                     </div>
 
                     <div className="absolute bottom-0 left-0 right-0 bg-teal-900/80 text-teal-100 p-2 text-xs flex justify-between">
@@ -227,3 +200,35 @@ export default function HeroSection() {
     </div>
   )
 }
+
+
+
+{/* <div className="relative w-full h-full overflow-hidden">
+                        <div className="absolute inset-0 grid grid-cols-6 grid-rows-6">
+                          {[...Array(6)].map((_, i) => (
+                            <div
+                              key={`col-${i}`}
+                              className="border-r border-teal-600/30 h-full"
+                            />
+                          ))}
+                          {[...Array(6)].map((_, i) => (
+                            <div
+                              key={`row-${i}`}
+                              className="border-b border-teal-600/30 w-full"
+                            />
+                          ))}
+                        </div>
+
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                          <div className="relative">
+                            <div className="h-6 w-6 bg-red-500 rounded-full flex items-center justify-center z-10 animate-pulse">
+                              <div className="h-3 w-3 bg-white rounded-full" />
+                            </div>
+                            <div className="absolute -inset-4 border-2 border-red-500/50 rounded-full animate-ping" />
+                          </div>
+                        </div>
+
+                        <div className="absolute top-1/4 left-1/3 h-4 w-4 bg-green-400 rounded-full" />
+                        <div className="absolute bottom-1/3 right-1/4 h-4 w-4 bg-green-400 rounded-full" />
+                        <div className="absolute top-2/3 right-1/3 h-4 w-4 bg-green-400 rounded-full" />
+                      </div> */}

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect} from "react";
 import { motion } from "framer-motion";
 import {
   AlertTriangle,
@@ -167,7 +167,13 @@ export default function EarthquakePage() {
   {/* Left Column - Earthquake Data */}
   <div className="bg-gray-800 p-6 rounded-lg row-span-3 col-span-2 flex flex-col items-center justify-center h-full">
     {/* <MapPin className="w-10 h-10 text-gray-600 mb-4" /> */}
-    <GoogleMapBox />
+    <GoogleMapBox
+      // center={{ lat: item.lat, lng: item.lng }}
+      zoom={10}
+      mapTypeId="satellite"
+    />
+
+
     <p className="text-gray-500">Map loading...</p>
   </div>
   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

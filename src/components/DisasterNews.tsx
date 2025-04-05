@@ -1,7 +1,9 @@
+
 'use client';
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { AlertCircle, Wind, Map } from 'lucide-react';
-import { LoadScript, GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
+import { GoogleMap, Marker, InfoWindow, useJsApiLoader } from '@react-google-maps/api';
 import ErrorBoundary from './ErrorBoundary';
 
 interface NewsItem {
@@ -25,7 +27,10 @@ interface AirQualityData {
   };
   location: string;
   timestamp: string;
-  coordinates: Coordinates;
+  coordinates: {
+    lat: number;
+    lng: number;
+  };
 }
 
 interface HotspotCity {
@@ -33,20 +38,6 @@ interface HotspotCity {
   country: string;
   coordinates: { lat: number; lng: number };
 }
-
-interface GDELTArticle {
-  url: string;
-  url_mobile: string;
-  title: string;
-  seendate: string;
-  socialimage: string;
-  domain: string;
-  language: string;
-  sourcecountry: string;
-  webUrl: string;
-  webPublicationDate: string;
-}
-
 
 interface MapPoint {
   id: string;
@@ -61,13 +52,8 @@ const mapContainerStyle = {
   height: '400px'
 };
 
-interface Coordinates {
-  lat: number;
-  lng: number; 
-}
-
 const defaultCenter = {
-  lat: 51.5074, // London coordinates as fallback
+  lat: 51.5074,
   lng: -0.1278
 };
 
@@ -85,28 +71,21 @@ const NewsDashboard = () => {
   const [userLocation, setUserLocation] = useState<string | null>(null);
   const [showMap, setShowMap] = useState<boolean>(true);
   const [selectedPoint, setSelectedPoint] = useState<MapPoint | null>(null);
-  const [isMapLoading, setIsMapLoading] = useState(true);
   const [mapCenter, setMapCenter] = useState(defaultCenter);
   
-  // Refs for intervals to ensure proper cleanup
+  
   const prevAqi = useRef<number | null>(null);
   const aqIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const newsIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
   
-  // Hotspot cities
-  // const hotspotCities: HotspotCity[] = [
-  //   { name: 'Delhi', country: 'India', coordinates: { lat: 28.7041, lng: 77.1025 } },
-  //   { name: 'London', country: 'UK' },
-  //   { name: 'Beijing', country: 'China' },
-  //   { name: 'New York', country: 'USA' },
-  //   { name: 'Los Angeles', country: 'USA' },
-  //   { name: 'Mexico City', country: 'Mexico' },
-  //   { name: 'Cairo', country: 'Egypt' },
-  //   { name: 'Lahore', country: 'Pakistan' },
-  //   { name: 'Jakarta', country: 'Indonesia' },
-  //   { name: 'Paris', country: 'France' },
-  // ];
+  const { isLoaded: mapsLoaded, loadError: mapLoadError } = useJsApiLoader({
+    id: 'env-dashboard-map',
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
+    version: "weekly",
+    libraries: ["places", "visualization"]
+  });
+
   const hotspotCities: HotspotCity[] = [
     { name: 'Delhi', country: 'India', coordinates: { lat: 28.7041, lng: 77.1025 } },
     { name: 'London', country: 'UK', coordinates: { lat: 51.5074, lng: -0.1278 } },
@@ -120,44 +99,15 @@ const NewsDashboard = () => {
     { name: 'Paris', country: 'France', coordinates: { lat: 48.8566, lng: 2.3522 } },
   ];
 
-  // Get user's location on initial load - runs only once
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-          try {
-            // Reverse geocoding to get location name
-            const response = await fetch(
-              `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
-            );
-            const data = await response.json();
-            const userLocationName = data.city || data.locality || 'Your Location';
-            setUserLocation(userLocationName);
-            setLocation(userLocationName);
-          } catch (error) {
-            console.error("Error getting location name:", error);
-          }
-        },
-        (error) => {
-          console.error("Error getting user location:", error);
-        }
-      );
-    }
+  const getAQICategory = useCallback((aqi: number): string => {
+    if (aqi <= 50) return 'Good';
+    if (aqi <= 100) return 'Moderate';
+    if (aqi <= 150) return 'Unhealthy for Sensitive';
+    if (aqi <= 200) return 'Unhealthy';
+    if (aqi <= 300) return 'Very Unhealthy';
+    return 'Hazardous';
   }, []);
 
-  // Debounce location input with increased delay to reduce API calls
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedLocation(location);
-    }, 1500);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [location]);
-
-  // Calculate US AQI from PM2.5 value - memoized to prevent recreating on every render
   const calculateUSAQI = useCallback((pm25: number): number => {
     const breakpoints = [
       [0.0, 12.0, 0, 50],
@@ -176,49 +126,50 @@ const NewsDashboard = () => {
     return 500;
   }, []);
 
-  // // Generate mock map data - memoized
-  // const generateMockMapData = useCallback((cityName: string, baseAqi: number) => {
-  //   // Generate 5 points around the city with slight AQI variations
-  //   const points = [];
-  //   for (let i = 0; i < 5; i++) {
-  //     const variation = Math.floor(Math.random() * 20) - 10; // -10 to +10
-  //     points.push({
-  //       id: `point-${i}`,
-  //       location: `${cityName} Area ${i+1}`,
-  //       aqi: Math.max(0, Math.min(500, baseAqi + variation)),
-  //       lat: 0, // Would be actual coordinates in real implementation
-  //       lng: 0
-  //     });
-  //   }
-  //   return points;
-  // }, []);
-
-  // AQI helper functions - memoized
-  const getAQICategory = useCallback((aqi: number): string => {
-    if (aqi <= 50) return 'Good';
-    if (aqi <= 100) return 'Moderate';
-    if (aqi <= 150) return 'Unhealthy for Sensitive';
-    if (aqi <= 200) return 'Unhealthy';
-    if (aqi <= 300) return 'Very Unhealthy';
-    return 'Hazardous';
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          try {
+            const response = await fetch(
+              `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+            );
+            const data = await response.json();
+            const userLocationName = data.city || data.locality || 'Your Location';
+            setUserLocation(userLocationName);
+            setLocation(userLocationName);
+          } catch (error) {
+            console.error("Error getting location name:", error);
+          }
+        },
+        (error) => {
+          console.error("Error getting user location:", error);
+        }
+      );
+    }
   }, []);
 
-  // Fetch air quality data function - extracted to be reusable
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedLocation(location);
+    }, 1500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [location]);
+
   const fetchAirQuality = useCallback(async () => {
     if (!debouncedLocation?.trim()) return;
     
     setIsLoadingAQ(true);
     try {
-
-      console.log("Fetching AQ for:", debouncedLocation);
-
       const geocodeResponse = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(debouncedLocation)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
       );
-      console.log("api key:", process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "No key found")
-
+      
       const geocodeData = await geocodeResponse.json();
-      console.log("Geocode data:", geocodeData);
       
       if (!geocodeData.results || geocodeData.results.length === 0) {
         throw new Error('Location not found');
@@ -228,13 +179,10 @@ const NewsDashboard = () => {
       setMapCenter(locationCoords);
 
       const apiKey = process.env.NEXT_PUBLIC_WAQI_API_KEY || 'demo';
-      
       const response = await fetch(
-        // `https://api.waqi.info/feed/${encodeURIComponent(debouncedLocation)}/?token=${apiKey}`
         `https://api.waqi.info/feed/geo:${locationCoords.lat};${locationCoords.lng}/?token=${apiKey}`
       );
       const data = await response.json();
-      console.log("Air quality data:", data);
       
       if (data.status !== 'ok') throw new Error('Invalid location or API error');
       
@@ -252,10 +200,7 @@ const NewsDashboard = () => {
         },
         location: debouncedLocation,
         timestamp: new Date().toISOString(),
-        coordinates: {
-          lat: locationCoords.lat,
-          lng: locationCoords.lng 
-        }
+        coordinates: locationCoords
       };
 
       setAirQuality(prev => {
@@ -289,28 +234,15 @@ const NewsDashboard = () => {
       const apiUrl = `https://api.gdeltproject.org/api/v2/doc/doc?query=${encodeURIComponent(queryParams)}&mode=artlist&format=json&maxrecords=5&sort=datedesc&timespan=1d&sourcelang=english`;
 
       const response = await fetch(apiUrl);
-      const rawResponse = await response.text();
-    
+      const data = await response.json();
+      
       if (!response.ok) {
-        throw new Error(`GDELT API error: ${rawResponse}`);
+        throw new Error(`GDELT API error: ${data}`);
       }
       
-      // Try to parse JSON
-      let data;
-      try {
-        data = JSON.parse(rawResponse);
-      } catch (jsonErr) {
-        throw new Error(`Invalid JSON response from GDELT: ${rawResponse}, ${jsonErr}`);
-      }
-      
-      const articles = Array.isArray(data.articles)
-      ? data.articles
-      : Array.isArray(data.results)
-      ? data.results
-      : [];
+      const articles = Array.isArray(data.articles) ? data.articles : Array.isArray(data.results) ? data.results : [];
   
-      // Transform articles
-      const gdeltNews = articles.map((article: GDELTArticle) => ({
+      const transformedNews = articles.map((article: any) => ({
         id: article.url || Math.random().toString(36).substring(2, 9),
         title: article.title || 'No title available',
         description: article.domain 
@@ -322,7 +254,6 @@ const NewsDashboard = () => {
         category: 'general',
       }));
   
-      // Add air quality update
       const airQualityNews: NewsItem = {
         id: `aq-${Date.now()}`,
         title: `${debouncedLocation} Air Quality - ${new Date().toLocaleTimeString()}`,
@@ -335,7 +266,7 @@ const NewsDashboard = () => {
         category: 'environment'
       };
   
-      setNews([airQualityNews, ...gdeltNews]);
+      setNews([airQualityNews, ...transformedNews]);
       setNewsError(null);
     } catch (error) {
       console.error("GDELT fetch error:", error);
@@ -347,47 +278,33 @@ const NewsDashboard = () => {
     }
   }, [debouncedLocation, airQuality]);
 
-  // Use effect for air quality - properly handles cleanup
   useEffect(() => {
-    if (aqIntervalRef.current) {
-      clearInterval(aqIntervalRef.current);
-      aqIntervalRef.current = null;
-    }
-
     fetchAirQuality();
-    aqIntervalRef.current = setInterval(fetchAirQuality, 300000); // Every 5 minutes
+    aqIntervalRef.current = setInterval(fetchAirQuality, 300000);
   
     return () => {
       if (aqIntervalRef.current) {
         clearInterval(aqIntervalRef.current);
-        aqIntervalRef.current = null;
       }
     };
   }, [fetchAirQuality]);
+
+  useEffect(() => {
+    fetchNews();
+    newsIntervalRef.current = setInterval(fetchNews, 1800000);
+
+    return () => {
+      if (newsIntervalRef.current) {
+        clearInterval(newsIntervalRef.current);
+      }
+    };
+  }, [fetchNews]);
 
   useEffect(() => {
     if (mapRef.current && airQuality?.coordinates) {
       mapRef.current.panTo(airQuality.coordinates);
     }
   }, [airQuality?.coordinates]);
-
-  useEffect(() => {
-    if (newsIntervalRef.current) {
-      clearInterval(newsIntervalRef.current);
-      newsIntervalRef.current = null;
-    }
-
-    fetchNews();
-
-    newsIntervalRef.current = setInterval(fetchNews, 1800000); // 30 minutes
-
-    return () => {
-      if (newsIntervalRef.current) {
-        clearInterval(newsIntervalRef.current);
-        newsIntervalRef.current = null;
-      }
-    };
-  }, [fetchNews]);
 
   const getAQIColor = (aqi: number): string => {
     if (aqi <= 50) return 'bg-green-100 text-green-800';
@@ -398,23 +315,14 @@ const NewsDashboard = () => {
     return 'bg-rose-100 text-rose-800';
   };
   
-  // const getMapPinColor = (aqi: number): string => {
-  //   if (aqi <= 50) return 'text-green-500';
-  //   if (aqi <= 100) return 'text-yellow-500';
-  //   if (aqi <= 150) return 'text-orange-500';
-  //   if (aqi <= 200) return 'text-red-500';
-  //   if (aqi <= 300) return 'text-purple-500';
-  //   return 'text-rose-500';
-  // };
-
-  const getHealthRecommendation = (aqi: number): string => {
+  const getHealthRecommendation = useCallback((aqi: number): string => {
     if (aqi <= 50) return 'Good air quality - safe for outdoor activities';
     if (aqi <= 100) return 'Moderate air quality - acceptable for most people, but sensitive individuals should consider reducing prolonged outdoor exertion';
     if (aqi <= 150) return 'Unhealthy for sensitive groups - People with respiratory or heart disease, the elderly and children should limit prolonged outdoor exertion';
     if (aqi <= 200) return 'Unhealthy - Everyone may begin to experience health effects; sensitive groups should avoid outdoor exertion';
     if (aqi <= 300) return 'Very Unhealthy - Health alert: everyone may experience more serious health effects. Avoid outdoor activities';
     return 'Hazardous - Health warnings of emergency conditions. Everyone should avoid all outdoor activities';
-  };
+  },[]);
 
   const formatTime = (isoString: string): string => {
     return new Date(isoString).toLocaleTimeString('en-GB', { 
@@ -424,13 +332,10 @@ const NewsDashboard = () => {
   };
 
   const handleHotspotSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    if (e.target.value) {
-      // setLocation(e.target.value);
-      const selectedCity = hotspotCities.find(city => city.name === e.target.value);
-      if (selectedCity) {
-        setLocation(selectedCity.name);
-        setMapCenter(selectedCity.coordinates);
-      }
+    const selectedCity = hotspotCities.find(city => city.name === e.target.value);
+    if (selectedCity) {
+      setLocation(selectedCity.name);
+      setMapCenter(selectedCity.coordinates);
     }
   };
 
@@ -444,7 +349,6 @@ const NewsDashboard = () => {
     const { lat, lng } = airQuality.coordinates;
     
     return Array.from({ length: 5 }, (_, i) => {
-      // Generate random points around the main location
       const pointlat = lat + (Math.random() * 0.02 - 0.01);
       const pointlng = lng + (Math.random() * 0.02 - 0.01);
       const aqi = Math.max(0, Math.min(500, airQuality.aqi + (Math.random() * 20 - 10)));
@@ -452,15 +356,20 @@ const NewsDashboard = () => {
       return {
         id: `point-${i}`,
         location: `Area ${i+1}`,
-        coordinates: { 
-          lat: pointlat,
-          lng: pointlng
-        },
+        coordinates: { lat: pointlat, lng: pointlng },
         aqi,
         category: getAQICategory(aqi)
       };
     });
   }, [airQuality, getAQICategory]);
+
+  const mapPoints = useMemo(() => generateMapPoints(), [generateMapPoints]);
+
+  const memoizedHealthRecommendation = useMemo(
+    () => airQuality ? getHealthRecommendation(airQuality.aqi) : '',
+    [airQuality, getHealthRecommendation]
+  );
+
 
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6">
@@ -485,7 +394,6 @@ const NewsDashboard = () => {
             )}
           </div>
           
-          {/* Hotspot Cities Dropdown */}
           <select 
             onChange={handleHotspotSelect}
             className="p-2 border rounded bg-white"
@@ -498,20 +406,9 @@ const NewsDashboard = () => {
               </option>
             ))}
           </select>
-          
-          {/* <select 
-            value={newsCategory} 
-            onChange={(e) => setNewsCategory(e.target.value)}
-            className="p-2 border rounded bg-white"
-          >
-            {['general', 'environment', 'health', 'technology'].map(opt => (
-              <option key={opt} value={opt}>{opt.charAt(0).toUpperCase() + opt.slice(1)}</option>
-            ))}
-          </select> */}
         </div>
       </div>
 
-      {/* Air Quality Card */}
       <div className="border rounded-lg overflow-hidden shadow-lg bg-white">
         <div className="bg-blue-50 px-6 py-4 border-b">
           <h2 className="text-xl font-semibold flex items-center gap-2">
@@ -570,10 +467,9 @@ const NewsDashboard = () => {
               </div>
               <div className="p-4 bg-blue-50 rounded-lg">
                 <h3 className="font-medium mb-2">Health Guidance</h3>
-                <p>{getHealthRecommendation(airQuality.aqi)}</p>
+                <p>{memoizedHealthRecommendation}</p>
               </div>
               
-              {/* Map visualization */}
               <div className="p-4 border rounded-lg">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="font-medium">AQI Map for {airQuality.location}</h3>
@@ -587,176 +483,89 @@ const NewsDashboard = () => {
                 </div>
                 
                 {showMap && (
-                <ErrorBoundary 
-                  fallback={<div className="text-red-500 p-4">Map failed to load</div>}
-                  >
-                  <LoadScript
-                  googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}
-                  onLoad={() => {
-                    setIsMapLoading(false);
-                    console.log("Google Maps script loaded");
-                  }}
-                  onError={() => {
-                    setIsMapLoading(false);
-                    console.error("Google Maps failed to load");
-                  }}
-                  >
-                  { isMapLoading ? (
-                     <div className="flex justify-center items-center h-64">
-                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                   </div>
-                 ) : (
-                    <GoogleMap
-                      mapContainerStyle={mapContainerStyle}
-                      center={mapCenter}
-                      zoom={12}
-                      onLoad={onMapLoad}
-                      options={{
-                        streetViewControl: false,
-                        mapTypeControl: false,
-                        fullscreenControl: false
-                      }}
-                    >
-
-                     {/* Main location marker */}
-                     {airQuality.coordinates && (
-                        <Marker
-                          position={{
-                            lat: airQuality.coordinates.lat,
-                            lng: airQuality.coordinates.lng
-                      }}
-                          icon={{
-                            path: google.maps.SymbolPath.CIRCLE,
-                            scale: 10,
-                            fillColor: getMarkerColor(airQuality.aqi),
-                            fillOpacity: 1,
-                            strokeWeight: 2,
-                            strokeColor: '#ffffff'
-                          }}
-                          onClick={() => {
-                            if (airQuality.coordinates) {
+                <ErrorBoundary fallback={<div className="text-red-500 p-4">Map failed to load</div>}>
+             
+                    {mapsLoaded ? (
+                      <GoogleMap
+                        mapContainerStyle={mapContainerStyle}
+                        center={mapCenter}
+                        zoom={12}
+                        onLoad={onMapLoad}
+                        options={{
+                          streetViewControl: false,
+                          mapTypeControl: false,
+                          fullscreenControl: false,
+                          gestureHandling: 'cooperative'
+                        }}
+                      >
+                        {airQuality.coordinates && (
+                          <Marker
+                            position={airQuality.coordinates}
+                            icon={{
+                              path: google.maps.SymbolPath.CIRCLE,
+                              scale: 10,
+                              fillColor: getMarkerColor(airQuality.aqi),
+                              fillOpacity: 1,
+                              strokeWeight: 2,
+                              strokeColor: '#ffffff'
+                            }}
+                            onClick={() => {
                               setSelectedPoint({
-                              id: 'main',
-                              location: airQuality.location,
-                              coordinates: airQuality.coordinates,
-                              aqi: airQuality.aqi,
-                              category: airQuality.category
+                                id: 'main',
+                                location: airQuality.location,
+                                coordinates: airQuality.coordinates,
+                                aqi: airQuality.aqi,
+                                category: airQuality.category
                               });
-                          }}}
-                        />
-                      )}
+                            }}
+                          />
+                        )}
 
-                      {generateMapPoints().map((point) => (
-                        <Marker 
-                          key={point.id} 
-                          position={point.coordinates} 
-                          icon={{
-                            path: google.maps.SymbolPath.CIRCLE,
-                            scale: 8,
-                            fillColor: getMarkerColor(point.aqi),
-                            fillOpacity: 1,
-                            strokeWeight: 2,
-                            strokeColor: '#ffffff'
-                          }}
-                          onClick={() => setSelectedPoint(point)}
-                        />
-                      ))}
+                        {mapPoints.map((point) => (
+                          <Marker 
+                            key={point.id} 
+                            position={point.coordinates} 
+                            icon={{
+                              path: google.maps.SymbolPath.CIRCLE,
+                              scale: 8,
+                              fillColor: getMarkerColor(point.aqi),
+                              fillOpacity: 1,
+                              strokeWeight: 2,
+                              strokeColor: '#ffffff'
+                            }}
+                            onClick={() => setSelectedPoint(point)}
+                          />
+                        ))}
 
-                      {/* InfoWindow for selected point */}
-                      {selectedPoint && (
-                        <InfoWindow
-                          position={selectedPoint.coordinates}
-                          onCloseClick={() => setSelectedPoint(null)}
-                        >
-                          <div className="p-2">
-                            <h4 className="font-bold">{selectedPoint.location}</h4>
-                            <div className={`px-2 py-1 rounded ${getAQIColor(selectedPoint.aqi)}`}>
-                              AQI: {selectedPoint.aqi} ({selectedPoint.category})
+                        {selectedPoint && (
+                          <InfoWindow
+                            position={selectedPoint.coordinates}
+                            onCloseClick={() => setSelectedPoint(null)}
+                          >
+                            <div className="p-2">
+                              <h4 className="font-bold">{selectedPoint.location}</h4>
+                              <div className={`px-2 py-1 rounded ${getAQIColor(selectedPoint.aqi)}`}>
+                                AQI: {selectedPoint.aqi} ({selectedPoint.category})
+                              </div>
                             </div>
-                          </div>
-                        </InfoWindow>
+                          </InfoWindow>
+                        )}
+                      </GoogleMap>
+                    ) : (
+                      <div className="text-center p-4 text-gray-500">
+                        {mapLoadError ? 'Failed to load map' : 'Loading map...'}
+                      </div>
+                    )}
+                      </ErrorBoundary>
                       )}
-                    </GoogleMap>
-                  )}
-                  </LoadScript>
-                </ErrorBoundary>
-                )}
-              </div>
-            </div>
+                    </div>
+                  </div>
           ) : (
             <div className="text-center p-6 text-gray-500">No air quality data</div>
           )}
-
-                  {/* <div className="relative">
-                    <div
-                      className="w-full h-64 object-cover rounded bg-gray-100" 
-                    />
-                    
-                    <div className="absolute inset-0">
-                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-                        <MapPin className={`h-8 w-8 ${getMapPinColor(airQuality.aqi)}`} />
-                        <div className={`px-2 py-1 rounded ${getAQIColor(airQuality.aqi)} text-xs font-bold mt-1`}>
-                          {airQuality.aqi}
-                        </div>
-                        <div className="text-xs font-medium mt-1 bg-white px-2 py-1 rounded shadow">
-                          {airQuality.location}
-                        </div>
-                      </div>
-                      
-                      {generateMockMapData(airQuality.location, airQuality.aqi).map((point, index) => {                        
-                        const angle = (index / 5) * 2 * Math.PI;
-                        const radius = 100; // pixels from center
-                        const top = `calc(50% + ${Math.sin(angle) * radius}px)`;
-                        const left = `calc(50% + ${Math.cos(angle) * radius}px)`;
-                        
-                        return (
-                          <div 
-                            key={point.id}
-                            className="absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center"
-                            style={{ top, left }}
-                          >
-                            <MapPin className={`h-6 w-6 ${getMapPinColor(point.aqi)}`} />
-                            <div className={`px-1.5 py-0.5 rounded ${getAQIColor(point.aqi)} text-xs font-bold`}>
-                              {point.aqi}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                    
-                    {/* Map overlay */}
-                    {/* <div className="absolute bottom-2 left-2 bg-white p-2 rounded shadow text-xs">
-                      <div className="font-bold mb-1">AQI Legend</div>
-                      <div className="flex gap-2">
-                        <div className="flex items-center">
-                          <div className="w-3 h-3 rounded-full bg-green-500 mr-1"></div>
-                          <span>0-50</span>
-                        </div>
-                        <div className="flex items-center">
-                          <div className="w-3 h-3 rounded-full bg-yellow-500 mr-1"></div>
-                          <span>51-100</span>
-                        </div>
-                        <div className="flex items-center">
-                          <div className="w-3 h-3 rounded-full bg-orange-500 mr-1"></div>
-                          <span>101-150</span>
-                        </div>
-                        <div className="flex items-center">
-                          <div className="w-3 h-3 rounded-full bg-red-500 mr-1"></div>
-                          <span>151+</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : (
-            <div className="text-center p-6 text-gray-500">No air quality data</div>
-          )} */} 
         </div>
       </div>
 
-      {/* News Feed */}
       <div className="border rounded-lg overflow-hidden shadow-lg bg-white">
         <div className="bg-blue-50 px-6 py-4 border-b">
           <h2 className="text-xl font-semibold flex items-center gap-2">
@@ -818,14 +627,13 @@ const NewsDashboard = () => {
   );
 };
 
-// Helper function to get marker color based on AQI
 function getMarkerColor(aqi: number): string {
-  if (aqi <= 50) return '#10B981'; // green-500
-  if (aqi <= 100) return '#F59E0B'; // yellow-500
-  if (aqi <= 150) return '#F97316'; // orange-500
-  if (aqi <= 200) return '#EF4444'; // red-500
-  if (aqi <= 300) return '#8B5CF6'; // purple-500
-  return '#F43F5E'; // rose-500
+  if (aqi <= 50) return '#10B981';
+  if (aqi <= 100) return '#F59E0B';
+  if (aqi <= 150) return '#F97316';
+  if (aqi <= 200) return '#EF4444';
+  if (aqi <= 300) return '#8B5CF6';
+  return '#F43F5E';
 }
 
 export default NewsDashboard;
