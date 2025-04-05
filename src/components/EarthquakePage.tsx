@@ -14,6 +14,7 @@ import {
   Activity,
   MapPin,
 } from "lucide-react";
+import GoogleMapBox from "@/components/GoogleMapBox";
 
 interface EarthquakeData {
   magnitude: number;
@@ -165,7 +166,8 @@ export default function EarthquakePage() {
   
   {/* Left Column - Earthquake Data */}
   <div className="bg-gray-800 p-6 rounded-lg row-span-3 col-span-2 flex flex-col items-center justify-center h-full">
-    <MapPin className="w-10 h-10 text-gray-600 mb-4" />
+    {/* <MapPin className="w-10 h-10 text-gray-600 mb-4" /> */}
+    <GoogleMapBox />
     <p className="text-gray-500">Map loading...</p>
   </div>
   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
