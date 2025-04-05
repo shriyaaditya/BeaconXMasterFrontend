@@ -9,8 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@react-google-maps/api": "^2.20.6",
     "chart.js": "^4.4.8",
     "framer-motion": "^12.6.2",
+    "googleapis": "^148.0.0",
     "lucide-react": "^0.484.0",
     "next": "15.2.4",
     "react": "^19.0.0",
@@ -25,6 +27,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/three": "^0.175.0",
     "eslint": "^9",
     "eslint-config-next": "15.2.4",
     "tailwindcss": "^4",
