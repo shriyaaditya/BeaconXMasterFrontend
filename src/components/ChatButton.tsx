@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import Chatbot from "@/components/Chatbot";
-import { Bot, X } from "lucide-react"
+import { X } from "lucide-react"
+import Bot from "@/components/Avatar"
 
 export default function ChatButton() {
     const [isChatbotOpen, setIsChatbotOpen] = useState(false);
@@ -12,10 +13,12 @@ export default function ChatButton() {
         {/* Chatbot Toggle Button */}
             <div className="relative overflow-hidden text-white z-100">
               <button 
-                className="fixed bottom-4 right-4 bg-teal-800 text-white p-2 rounded-full shadow-lg hover:bg-teal-700 transition"
+               className={`fixed bottom-4 right-4 text-white p-2 rounded-full shadow-lg hover:bg-teal-700 transition ${
+                !isChatbotOpen ? 'bg-transparent shadow-none hover:bg-transparent' : 'bg-teal-800'
+              }`}
                 onClick={() => setIsChatbotOpen(!isChatbotOpen)}
               >
-                {isChatbotOpen ? <X size={28}/> : <Bot size={30}/>}
+                {isChatbotOpen ? <X size={28}/> : <Bot/>}
               </button>
         
               {/* Chatbot Pop-up */}
