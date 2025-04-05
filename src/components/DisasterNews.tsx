@@ -567,67 +567,6 @@ const NewsDashboard = () => {
         </div>
       </div>
 
-      {/* <div className="border rounded-lg overflow-hidden shadow-lg bg-white">
-        <div className="bg-blue-50 px-6 py-4 border-b">
-          <h2 className="text-xl font-semibold flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-blue-600" /> 
-            Latest News for {debouncedLocation}
-          </h2>
-        </div>
-        <div className="p-6">
-          {isLoadingNews ? (
-            <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            </div>
-          ) : newsError ? (
-            <div className="flex items-center justify-center p-6 text-red-500">
-              <AlertCircle className="mr-2 h-5 w-5" /> {newsError}
-            </div>
-          ) : news.length > 0 ? (
-            <div className="space-y-4">
-              {news.map((item) => (
-                <a 
-                  key={item.id} 
-                  href={item.url === '#' ? undefined : item.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className={`block border rounded-lg p-4 ${item.url === '#' ? '' : 'hover:bg-blue-100'} transition-colors`}
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-medium">{item.title}</h3>
-                        {item.id.startsWith('aq') && (
-                          <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                            LIVE
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-gray-600 mb-2">{item.description}</p>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-500">{item.source}</span>
-                        <div className="text-xs text-gray-400">
-                          {formatTime(item.publishedAt)}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </a>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center p-6 text-gray-500">No news available</div>
-          )}
-        </div>
-      </div>
-      
-      <div className="text-center text-sm text-gray-500 mt-4">
-        Data sources: WAQI for air quality, GDELT for news. Refresh rate: AQI - 5 minutes, News - 30 minutes.
-      </div>
-    </div>
-  );
-}; */}
-
 <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

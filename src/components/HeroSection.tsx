@@ -201,34 +201,3 @@ export default function HeroSection() {
   )
 }
 
-
-
-{/* <div className="relative w-full h-full overflow-hidden">
-                        <div className="absolute inset-0 grid grid-cols-6 grid-rows-6">
-                          {[...Array(6)].map((_, i) => (
-                            <div
-                              key={`col-${i}`}
-                              className="border-r border-teal-600/30 h-full"
-                            />
-                          ))}
-                          {[...Array(6)].map((_, i) => (
-                            <div
-                              key={`row-${i}`}
-                              className="border-b border-teal-600/30 w-full"
-                            />
-                          ))}
-                        </div>
-
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                          <div className="relative">
-                            <div className="h-6 w-6 bg-red-500 rounded-full flex items-center justify-center z-10 animate-pulse">
-                              <div className="h-3 w-3 bg-white rounded-full" />
-                            </div>
-                            <div className="absolute -inset-4 border-2 border-red-500/50 rounded-full animate-ping" />
-                          </div>
-                        </div>
-
-                        <div className="absolute top-1/4 left-1/3 h-4 w-4 bg-green-400 rounded-full" />
-                        <div className="absolute bottom-1/3 right-1/4 h-4 w-4 bg-green-400 rounded-full" />
-                        <div className="absolute top-2/3 right-1/3 h-4 w-4 bg-green-400 rounded-full" />
-                      </div> */}
