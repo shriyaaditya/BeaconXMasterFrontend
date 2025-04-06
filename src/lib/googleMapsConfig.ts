@@ -1,7 +1,7 @@
 
-import type { LoadScriptUrlOptions } from '@react-google-maps/api';
+import type { LoadScriptProps } from '@react-google-maps/api';
 
-export const GOOGLE_MAPS_CONFIG = {
+export const GOOGLE_MAPS_CONFIG: LoadScriptProps = {
     id: "google-map-script", // Pick one ID and use everywhere
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
     version: "weekly",
