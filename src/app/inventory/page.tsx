@@ -14,7 +14,6 @@ import {
   Legend
 } from "chart.js"
 import { Bar, Line, Doughnut } from "react-chartjs-2"
-import EarthquakePage from "@/components/EarthquakePage"
 
 // Register ChartJS components
 Chart.register(
@@ -622,7 +621,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      <EarthquakePage/>
       {/* Header */}
       <header className="bg-gray-800 p-4 shadow-lg">
         <div className="container mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4">

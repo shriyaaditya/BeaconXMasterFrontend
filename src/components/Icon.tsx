@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+// import { useRouter } from "next/router";
 import Link from "next/link";
 
 type Disaster = {
@@ -13,6 +14,8 @@ type DisasterIconsProps = {
   count?: number;
   disasters?: Disaster[];
 };
+
+// const router = useRouter();
 
 const AlertIcon = ({ className = "" }: { className?: string }) => (
   <svg
@@ -124,10 +127,10 @@ export default function DisasterIcons({
                      bg-red-600 shadow-xl hover:bg-red-700 transition-all focus:ring-2 
                      focus:ring-red-900"
           aria-label={`${internalDisasters.length} alerts - Click for details`}
-          onClick={(e) => {
-            e.preventDefault();
-            setIsHovered(!isHovered);
-          }}
+          // onClick={(e) => {
+          //   e.preventDefault();
+          //   setIsHovered(!isHovered);
+          // }}
         >
           <span className="absolute inset-0 animate-ripple rounded-full border-2 border-white opacity-70"></span>
           <span className="absolute inset-0 animate-ripple2 rounded-full border-2 border-white opacity-40"></span>
@@ -170,7 +173,7 @@ export default function DisasterIcons({
             {internalDisasters.map((disaster, index) => (
               <Link
                 key={disaster.id}
-                href={`/${disaster.type}/${disaster.id}`}
+                href={`/${disaster.type === "earthquake" ? "earthquakePage" : "cyclonePage"}`}
                 className={`flex items-center px-4 py-3 hover:bg-red-50 transition-colors ${
                   index !== internalDisasters.length - 1 ? 'border-b' : ''
                 }`}
