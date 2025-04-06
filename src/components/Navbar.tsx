@@ -3,25 +3,31 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Menu, X, UserPlus, LogOut, Home, Bell, BookOpen, Package, Users, Info } from "lucide-react"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter} from "next/navigation"
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
-  const pathname = usePathname()
+  const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+  const { user, logout } = useAuth();
+  
+  const router = useRouter();
 
   // Navigation links with icons
   const navLinks = [
-    { name: "Home", path: "/", icon: <Home className="h-5 w-5" /> },
+    ...(user ? [
+      { name: "Dashboard", path: "/dashboard", icon: <Home className="h-5 w-5" /> },
+    ] : [ { name: "Home", path: "/", icon: <Home className="h-5 w-5" /> } ]),
     { name: "Alerts", path: "/alerts", icon: <Bell className="h-5 w-5" /> },
-    { name: "Survival Guide", path: "/guide", icon: <BookOpen className="h-5 w-5" /> },
-    { name: "Inventory", path: "/inventory", icon: <Package className="h-5 w-5" /> },
-    { name: "Community", path: "/community", icon: <Users className="h-5 w-5" /> },
+    { name: "SurvivalGuide", path: "/guide", icon: <BookOpen className="h-5 w-5" /> },
+    ...(user ? [
+      { name: "Inventory", path: "/inventory", icon: <Package className="h-5 w-5" /> },
+      { name: "AirFeed", path: "/community", icon: <Users className="h-5 w-5" /> },
+    ] : []),
     { name: "About", path: "/about", icon: <Info className="h-5 w-5" /> },
   ]
   
-  const { user, logout } = useAuth();
 
   // Handle scroll effect
   useEffect(() => {
@@ -163,7 +169,7 @@ export default function Navbar() {
                 </Link>
               ) : (
                 <button
-                  onClick={logout}
+                  onClick={() => router.push("/login")}
                   className="flex items-center space-x-2 px-5 py-2.5 rounded-md 
                     bg-gradient-to-r from-teal-600 to-teal-500 text-white relative group overflow-hidden
                     transition-all duration-300 shadow-lg shadow-teal-500/20 hover:shadow-teal-400/30"

@@ -64,7 +64,7 @@ export default function ChatbotPage() {
     setMessages([{
       id: "1",
       role: "assistant",
-      content: "Hi there! 👋 I'm BeaconX, your friendly helper during emergencies. How can I help you today?",
+      content: "Hi there! 👋 I'm Acon, your friendly helper during emergencies. How can I help you today?",
       timestamp: new Date().toISOString(),
     }])
   }, [])
@@ -196,7 +196,7 @@ export default function ChatbotPage() {
             <div className="w-5 h-5 rounded-full bg-white p-1 mr-3 flex items-center justify-center">
               <AlertCircle className="text-teal-500" size={15} />
             </div>
-            <h1 className="text-[20px] font-bold">BeaconX Helper</h1>
+            <h1 className="text-[20px] font-bold">Acon</h1>
           </div>
           <div className="text-xs bg-teal-600 px-3 py-1 rounded-full">Emergency Helper</div>
         </div>

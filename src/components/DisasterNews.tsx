@@ -240,10 +240,21 @@ const NewsDashboard = () => {
       if (!response.ok) {
         throw new Error(`GDELT API error: ${data}`);
       }
+
+      type Article = {
+        url?: string;
+        title?: string;
+        domain?: string;
+        sourcecountry?: string;
+        webUrl?: string;
+        seendate?: string;
+        webPublicationDate?: string;
+      };
+    
       
       const articles = Array.isArray(data.articles) ? data.articles : Array.isArray(data.results) ? data.results : [];
   
-      const transformedNews = articles.map((article: any) => ({
+      const transformedNews = articles.map((article: Article) => ({
         id: article.url || Math.random().toString(36).substring(2, 9),
         title: article.title || 'No title available',
         description: article.domain 
@@ -373,9 +384,9 @@ const NewsDashboard = () => {
 
 
   return (
-    <div className="flex flex-col gap-6 p-4 md:p-6">
+    <div className="flex flex-col gap-6 p-4 bg-gray-950 text-gray-200 md:p-6">
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <h1 className="text-2xl font-bold">Environmental Dashboard</h1>
+        <h1 className="text-2xl text-emerald-400 font-bold">Environmental Dashboard</h1>
         <div className="flex flex-col sm:flex-row gap-2">
           <div className="flex gap-2 items-center">
             <input
@@ -383,12 +394,12 @@ const NewsDashboard = () => {
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               placeholder="Enter location"
-              className="p-2 border rounded bg-white w-48"
+              className="p-2 border border-gray-700 rounded bg-gray-800 text-gray-200 w-48 focus:outline-none focus:ring-1 focus:ring-emerald-500"
             />
             {userLocation && (
               <button 
                 onClick={() => setLocation(userLocation)}
-                className="text-sm text-blue-600 hover:underline"
+                className="text-sm text-emerald-400 hover:text-emerald-300 hover:underline"
               >
                 Use my location
               </button>
@@ -397,7 +408,7 @@ const NewsDashboard = () => {
           
           <select 
             onChange={handleHotspotSelect}
-            className="p-2 border rounded bg-white"
+            className="p-2 border border-gray-700 rounded bg-gray-800 text-gray-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
             value=""
           >
             <option value="" disabled>Pollution Hotspots</option>
@@ -410,13 +421,13 @@ const NewsDashboard = () => {
         </div>
       </div>
 
-      <div className="border rounded-lg overflow-hidden shadow-lg bg-white">
-        <div className="bg-blue-50 px-6 py-4 border-b">
+      <div className="border border-gray-800 rounded-lg overflow-hidden shadow-lg bg-gray-900">
+        <div className="bg-gray-800 text-emerald-400 px-6 py-4 border-b border-gray-700">
           <h2 className="text-xl font-semibold flex items-center gap-2">
-            <Wind className="h-5 w-5 text-blue-600" /> 
+            <Wind className="h-5 w-5 text-emerald-500" /> 
             Live Air Quality - {debouncedLocation}
             {airQuality && (
-              <span className="ml-2 text-sm text-blue-600">
+              <span className="ml-2 text-sm text-emerald-300">
                 Updated {formatTime(airQuality.timestamp)}
               </span>
             )}
@@ -425,10 +436,10 @@ const NewsDashboard = () => {
         <div className="p-6">
           {isLoadingAQ ? (
             <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
             </div>
           ) : aqError ? (
-            <div className="flex items-center justify-center p-6 text-red-500">
+            <div className="flex items-center justify-center p-6 text-red-400">
               <AlertCircle className="mr-2 h-5 w-5" /> {aqError}
             </div>
           ) : airQuality ? (
@@ -445,8 +456,8 @@ const NewsDashboard = () => {
                     )}
                   </div>
                   <div className="ml-4">
-                    <div className="text-xl font-medium">{airQuality.category}</div>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-xl font-medium text-gray-100">{airQuality.category}</div>
+                    <div className="text-sm text-gray-400">
                       {airQuality.location}
                     </div>
                   </div>
@@ -459,24 +470,24 @@ const NewsDashboard = () => {
                         key === 'pm10' ? 'bg-green-500' :
                         key === 'o3' ? 'bg-yellow-500' : 'bg-red-500'
                       }`}></div>
-                      <span className="text-sm">
+                      <span className="text-sm text-gray-300">
                         {key.toUpperCase()}: {value} µg/m³
                       </span>
                     </div>
                   ))}
                 </div>
               </div>
-              <div className="p-4 bg-blue-50 rounded-lg">
-                <h3 className="font-medium mb-2">Health Guidance</h3>
-                <p>{memoizedHealthRecommendation}</p>
+              <div className="p-4 bg-gray-800 border border-gray-700 rounded-lg">
+                <h3 className="font-medium mb-2 text-emerald-400">Health Guidance</h3>
+                <p className="text-gray-300">{memoizedHealthRecommendation}</p>
               </div>
               
-              <div className="p-4 border rounded-lg">
+              <div className="p-4 border border-gray-700 rounded-lg">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="font-medium">AQI Map for {airQuality.location}</h3>
+                  <h3 className="font-medium text-emerald-400">AQI Map for {airQuality.location}</h3>
                   <button 
                     onClick={() => setShowMap(!showMap)} 
-                    className="text-blue-600 text-sm hover:underline flex items-center gap-1"
+                    className="text-emerald-400 text-sm hover:text-emerald-300 hover:underline flex items-center gap-1"
                   >
                     <Map className="h-4 w-4" /> 
                     {showMap ? 'Hide Map' : 'Show Map'}
@@ -484,7 +495,7 @@ const NewsDashboard = () => {
                 </div>
                 
                 {showMap && (
-                <ErrorBoundary fallback={<div className="text-red-500 p-4">Map failed to load</div>}>
+                <ErrorBoundary fallback={<div className="text-red-400 p-4">Map failed to load</div>}>
              
                     {mapsLoaded ? (
                       <GoogleMap
@@ -496,7 +507,7 @@ const NewsDashboard = () => {
                           streetViewControl: false,
                           mapTypeControl: false,
                           fullscreenControl: false,
-                          gestureHandling: 'cooperative'
+                          gestureHandling: 'cooperative',
                         }}
                       >
                         {airQuality.coordinates && (
@@ -543,7 +554,7 @@ const NewsDashboard = () => {
                             position={selectedPoint.coordinates}
                             onCloseClick={() => setSelectedPoint(null)}
                           >
-                            <div className="p-2">
+                            <div className="p-2 bg-gray-800 text-gray-200">
                               <h4 className="font-bold">{selectedPoint.location}</h4>
                               <div className={`px-2 py-1 rounded ${getAQIColor(selectedPoint.aqi)}`}>
                                 AQI: {selectedPoint.aqi} ({selectedPoint.category})
@@ -553,7 +564,7 @@ const NewsDashboard = () => {
                         )}
                       </GoogleMap>
                     ) : (
-                      <div className="text-center p-4 text-gray-500">
+                      <div className="text-center p-4 text-gray-400">
                         {mapLoadError ? 'Failed to load map' : 'Loading map...'}
                       </div>
                     )}
@@ -561,8 +572,8 @@ const NewsDashboard = () => {
                       )}
                     </div>
                   </div>
-          ) : (
-            <div className="text-center p-6 text-gray-500">No air quality data</div>
+            ) : (
+            <div className="text-center p-6 text-gray-400">No air quality data</div>
           )}
         </div>
       </div>
@@ -571,21 +582,21 @@ const NewsDashboard = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="border rounded-xl overflow-hidden shadow-lg bg-white hover:shadow-xl transition-shadow"
+        className="border border-gray-800 rounded-xl overflow-hidden shadow-lg bg-gray-900 hover:shadow-xl transition-shadow"
       >
-        <div className="bg-gradient-to-r from-blue-50 to-blue-100 px-6 py-4 border-b">
-          <h2 className="text-xl font-semibold flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-blue-600" />
+        <div className="bg-gray-800 px-6 py-4 border-b border-gray-700">
+          <h2 className="text-xl font-semibold flex items-center gap-2 text-emerald-400">
+            <AlertCircle className="h-5 w-5 text-emerald-500" />
             Latest News for {debouncedLocation}
           </h2>
         </div>
         <div className="p-6">
           {isLoadingNews ? (
             <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
             </div>
           ) : newsError ? (
-            <div className="flex items-center justify-center p-6 text-red-500">
+            <div className="flex items-center justify-center p-6 text-red-400">
               <AlertCircle className="mr-2 h-5 w-5" /> {newsError}
             </div>
           ) : news.length > 0 ? (
@@ -604,23 +615,23 @@ const NewsDashboard = () => {
                       href={item.url === "#" ? undefined : item.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`block h-full border rounded-xl p-4 ${
-                        item.url === "#" ? "cursor-default" : "hover:shadow-md"
-                      } transition-all bg-white`}
+                      className={`block h-full border border-gray-700 rounded-xl p-4 ${
+                        item.url === "#" ? "cursor-default" : "hover:bg-gray-800"
+                      } transition-all bg-gray-900`}
                     >
                       <div className="flex flex-col h-full">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-3">
-                            <h3 className="font-medium text-lg line-clamp-2">
+                            <h3 className="font-medium text-lg line-clamp-2 text-gray-100">
                               {item.title}
                             </h3>
                             {item.id.startsWith("aq") && (
-                              <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full whitespace-nowrap">
+                              <span className="px-2 py-1 bg-red-900 text-red-200 text-xs rounded-full whitespace-nowrap">
                                 LIVE UPDATE
                               </span>
                             )}
                           </div>
-                          <p className="text-gray-600 mb-4 line-clamp-3">
+                          <p className="text-gray-400 mb-4 line-clamp-3">
                             {item.description}
                           </p>
                         </div>
@@ -628,7 +639,7 @@ const NewsDashboard = () => {
                           <span className="text-sm text-gray-500 truncate max-w-[120px]">
                             {item.source}
                           </span>
-                          <div className="text-xs text-gray-400 whitespace-nowrap">
+                          <div className="text-xs text-gray-500 whitespace-nowrap">
                             {formatTime(item.publishedAt)}
                           </div>
                         </div>
@@ -639,7 +650,7 @@ const NewsDashboard = () => {
               </AnimatePresence>
             </div>
           ) : (
-            <div className="text-center p-6 text-gray-500">
+            <div className="text-center p-6 text-gray-400">
               No news available
             </div>
           )}

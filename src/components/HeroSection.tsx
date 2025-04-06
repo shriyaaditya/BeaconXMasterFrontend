@@ -67,7 +67,7 @@ export default function HeroSection() {
                   href="/resources"
                   className="inline-flex items-center justify-center bg-teal-800 hover:bg-teal-700 text-white font-medium px-6 py-3 rounded-lg border border-teal-700 transition-colors duration-200"
                 >
-                  Find Resources
+                  Get Started
                 </Link>
               </div>
 

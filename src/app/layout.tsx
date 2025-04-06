@@ -14,14 +14,22 @@ export default function RootLayout({
 }) {
   const pathname = usePathname();
   const isAuthPage = pathname === '/login';
+  const sampleDisasters = [
+    { type: "earthquake", id: "eq-1" },
+    { type: "earthquake", id: "eq-2" },
+    { type: "earthquake", id: "eq-3" },
+    { type: "cyclone", id: "cy-1" },
+    { type: "cyclone", id: "cy-2" },
+  ];
+
   return (
     <html lang="en">
       <body className="flex flex-col min-h-screen">
         {!isAuthPage && <Navbar />}
         <main className="flex-1">
           {children}
-        </main>
-        {!isAuthPage && <Icon type="earthquake" count={3}/>}
+        </main>        
+        {!isAuthPage && <Icon disasters={sampleDisasters} />}
         {!isAuthPage && <Chatbutton />}
         {!isAuthPage && <Footer />}
       </body>

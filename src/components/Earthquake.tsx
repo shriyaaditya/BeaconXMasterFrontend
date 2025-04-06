@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import GoogleMapBox from "@/components/GoogleMapBox";
 import { getAllEarthquakes } from "@/lib/earthquake"; 
+import Link from "next/link";
 
 export default function EarthquakePage() {
 
@@ -131,7 +132,11 @@ export default function EarthquakePage() {
       <div className="bg-gray-800 p-6 rounded-lg row-span-3 col-span-2 flex flex-col items-center justify-center h-full">
         <GoogleMapBox
           zoom={10}
-          mapTypeId="satellite"
+          mapTypeId="hybrid"
+          center={latestEarthquake ? { lat: latestEarthquake.latitude, lng: latestEarthquake.longitude } : undefined}
+          // center={{lat: 19.07, lng: 72.87}}
+          showOpenSpaces={true}
+          showShelterPoints={true}
         />
       </div>
 
@@ -277,6 +282,19 @@ export default function EarthquakePage() {
     </div>
 
   </div>
+  <Link 
+    href={{
+      pathname: "/inventory",
+      query: {
+        magnitude: latestEarthquake?.magnitude,
+        depth: latestEarthquake?.depth_km,
+        latitude: latestEarthquake?.latitude,
+        longitude: latestEarthquake?.longitude
+      }
+    }}
+  >
+  </Link>
+
   </main>
   );
 }

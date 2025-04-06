@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
   Chart,
   CategoryScale,
@@ -14,6 +14,7 @@ import {
   Legend
 } from "chart.js"
 import { Bar, Line, Doughnut } from "react-chartjs-2"
+import { useSearchParams } from 'next/navigation';
 
 // Register ChartJS components
 Chart.register(
@@ -28,12 +29,12 @@ Chart.register(
 )
 
 // Disaster severity levels
-const DISASTER_SEVERITY = {
-  LOW: { level: 1, label: "Mild", color: "bg-green-500" },
-  MODERATE: { level: 2, label: "Moderate", color: "bg-yellow-500" },
-  HIGH: { level: 3, label: "High", color: "bg-orange-500" },
-  EXTREME: { level: 4, label: "Catastrophic", color: "bg-red-500" },
-}
+// const DISASTER_SEVERITY = {
+//   LOW: { level: 1, label: "Mild", color: "bg-green-500" },
+//   MODERATE: { level: 2, label: "Moderate", color: "bg-yellow-500" },
+//   HIGH: { level: 3, label: "High", color: "bg-orange-500" },
+//   EXTREME: { level: 4, label: "Catastrophic", color: "bg-red-500" },
+// }
 
 // Category icons mapping
 const categoryIcons = {
@@ -53,7 +54,7 @@ interface InventoryItem {
   min: number
   reorder: number
   max: number
-  depletionRate?: number // Added for dynamic depletion based on severity
+  depletionRate?: number 
 }
 
 interface CategoryData {
@@ -108,13 +109,31 @@ const fetchGoogleSheetData = async () => {
   }
 };
 
+export default function Home() {
+const searchParams = useSearchParams();
+  
+  // Get earthquake parameters from URL
+  const earthquakeMagnitude = parseFloat(searchParams.get('magnitude') ?? '0');
+  const earthquakeDepth = parseFloat(searchParams.get('depth') ?? '0');
+  const earthquakeLatitude = parseFloat(searchParams.get('latitude') ?? '0');
+  const earthquakeLongitude = parseFloat(searchParams.get('longitude') ?? '0');
+
+
 // Function to fetch disaster severity from ML model
-const fetchDisasterSeverity = async (): Promise<number> => {
+const fetchDisasterSeverity = useCallback(async (): Promise<SeverityLevel> => {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
-                   (typeof window !== 'undefined' ? window.location.origin : '');
-    const response = await fetch(`${baseUrl}/api/ml-model`, {
-      cache: 'no-store'
+
+    const response = await fetch("https://df51-103-196-217-233.ngrok-free.app/combined/predict", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        magnitude: earthquakeMagnitude,
+        depth: earthquakeDepth,
+        latitude: earthquakeLatitude,
+        longitude: earthquakeLongitude
+      })
     });
 
     if (!response.ok) {
@@ -122,12 +141,13 @@ const fetchDisasterSeverity = async (): Promise<number> => {
     }
 
     const data = await response.json();
-    return data.severityLevel || 1; // Default to low severity if not provided
+    console.log("API Response:", data.severity)
+    return data.severity ?? "Low"; 
   } catch (error) {
     console.error("Error fetching disaster severity:", error);
-    return 1; // Default to low severity on error
+    return "Low"; // Default to low severity on error
   }
-};
+},[earthquakeMagnitude, earthquakeDepth, earthquakeLatitude, earthquakeLongitude]);
 
 // Function to parse Google Sheets data
 const parseSheetData = (data: string[][], severityLevel: number): InventoryData => {
@@ -276,7 +296,6 @@ const generateAllocationRecommendations = (
   })
 }
 
-export default function Home() {
   const [inventoryData, setInventoryData] = useState<InventoryData>({})
   const [currentInventory, setCurrentInventory] = useState<CurrentInventory>({})
   const [selectedCategory, setSelectedCategory] = useState<string>("")
@@ -286,36 +305,47 @@ export default function Home() {
   const [allocationRecs, setAllocationRecs] = useState<AllocationRecommendation[]>([])
   const [isAllocating, setIsAllocating] = useState<boolean>(false)
   const [lastUpdated, setLastUpdated] = useState<string>("")
-  const [disasterSeverity, setDisasterSeverity] = useState<number>(1)
+  const [disasterSeverity, setDisasterSeverity] = useState<SeverityLevel>("Low")
   const lineChartRef = useRef(null)
 
+  type SeverityLevel = "Low" | "Moderate" | "Severe" | "Catastrophic";
+
+  const severityMap: Record<SeverityLevel, number> = useMemo(() => ({
+    "Low": 1,
+    "Moderate": 2,
+    "Severe": 3,
+    "Catastrophic": 4
+  }), []);
+    
   // Load Google Sheets data and disaster severity
   useEffect(() => {
     const loadData = async () => {
       try {
         setIsLoading(true);
         setError(null);
-
+        
         // Fetch disaster severity first
         const severity = await fetchDisasterSeverity();
         setDisasterSeverity(severity);
+        
+        const currentNumericSeverity = severityMap[severity] ?? 1;
 
         // Then fetch inventory data with severity context
         const fetchedData = await fetchGoogleSheetData();
         if (!fetchedData || !fetchedData.values || fetchedData.values.length === 0) {
           throw new Error("No data received from Google Sheets API");
         }
-
-        const parsedData = parseSheetData(fetchedData.values, severity);
+        
+        const parsedData = parseSheetData(fetchedData.values, currentNumericSeverity);
         setInventoryData(parsedData);
-
+        
         // Select the first category (if available)
         if (Object.keys(parsedData).length > 0) {
           setSelectedCategory(Object.keys(parsedData)[0]);
         }
-
+        
         // Generate current inventory levels with severity context
-        setCurrentInventory(generateCurrentInventory(parsedData, severity));
+        setCurrentInventory(generateCurrentInventory(parsedData, currentNumericSeverity));
       } catch (err) {
         console.error("Error loading data:", err);
         setError("Failed to load inventory data.");
@@ -323,10 +353,11 @@ export default function Home() {
         setIsLoading(false);
       }
     };
-
+    
     loadData();
-  }, []);
-
+  }, [fetchDisasterSeverity, severityMap]);
+  
+  const numericSeverity = severityMap[disasterSeverity as keyof typeof severityMap] ?? 1;
   // Update allocation recommendations when category or severity changes
   useEffect(() => {
     if (selectedCategory && Object.keys(currentInventory).length > 0) {
@@ -335,11 +366,11 @@ export default function Home() {
           inventoryData, 
           currentInventory, 
           selectedCategory,
-          disasterSeverity
+          numericSeverity
         )
       )
     }
-  }, [selectedCategory, currentInventory, inventoryData, disasterSeverity])
+  }, [selectedCategory, currentInventory, inventoryData, numericSeverity])
 
   // Refresh inventory data
   const refreshInventory = async () => {
@@ -349,12 +380,12 @@ export default function Home() {
       setDisasterSeverity(severity)
       
       const sheetData = await fetchGoogleSheetData()
-      const parsedData = parseSheetData(sheetData, severity)
+      const parsedData = parseSheetData(sheetData, numericSeverity)
       
       setInventoryData(parsedData)
       setLastUpdated(new Date().toLocaleString())
       
-      const currentInv = generateCurrentInventory(parsedData, severity)
+      const currentInv = generateCurrentInventory(parsedData, numericSeverity)
       setCurrentInventory(currentInv)
     } catch (err) {
       console.error("Error refreshing data:", err)
@@ -411,12 +442,12 @@ export default function Home() {
     const datasets = inventoryData[selectedCategory].items.map((item, index) => {
       // Generate data points that trend downward based on depletion rate and severity
       const baseDepletionRate = item.depletionRate || 0.02
-      const severityImpact = 1 + (disasterSeverity * 0.3) // 30% increase per severity level
+      const severityImpact = 1 + (numericSeverity * 0.3) // 30% increase per severity level
       const effectiveDepletionRate = baseDepletionRate * severityImpact
 
       // Start from a random point between min and max
       const startValue = Math.floor(
-        Math.random() * (item.max - item.min) + item.min * (1 - (disasterSeverity * 0.1)))
+        Math.random() * (item.max - item.min) + item.min * (1 - (numericSeverity * 0.1)))
       
       const data = Array(7).fill(null).map((_, i) => {
         // Calculate depletion with some randomness
@@ -615,9 +646,19 @@ export default function Home() {
   }
 
   // Get severity display info
-  const getSeverityInfo = (level: number) => {
-    return Object.values(DISASTER_SEVERITY).find(s => s.level === level) || DISASTER_SEVERITY.LOW
-  }
+  const getSeverityInfo = (severity: string) => {
+    switch (severity) {
+      case "Moderate":
+        return { color: "bg-yellow-400 text-yellow-900", label: "Moderate" };
+      case "Severe":
+        return { color: "bg-orange-500 text-white", label: "Severe" };
+      case "Catastrophic":
+        return { color: "bg-red-600 text-white", label: "Catastrophic" };
+      case "Low":
+      default:
+        return { color: "bg-green-400 text-green-900", label: "Low" };
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -836,7 +877,7 @@ export default function Home() {
                           <p className="text-sm">
                             <span className="font-semibold">Disaster Severity Impact:</span> 
                             <br />
-                            Higher severity increases depletion rates by {disasterSeverity * 30}% and allocation recommendations.
+                            Higher severity increases depletion rates by {numericSeverity * 30}% and allocation recommendations.
                           </p>
                         </div>
                       </>

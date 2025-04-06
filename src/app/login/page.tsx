@@ -214,7 +214,7 @@ export default function LoginPage() {
         <div className="flex items-center justify-center mb-6">
           <Cloud className="text-teal-600 w-12 h-12 mr-3 animate-bounce" />
           <h2 className="text-4xl font-bold text-teal-800 tracking-tight">
-            Disaster Shield
+            BeaconX
           </h2>
         </div>
 

@@ -34,24 +34,10 @@ export default function Footer() {
           ))}
         </div>
       </div>
-      
-      {/* Wave Divider
-      <div className="absolute top-0 left-0 w-full overflow-hidden leading-none">
-        <svg 
-          className="relative block w-full h-12 md:h-16" 
-          viewBox="0 0 1200 120"
-          preserveAspectRatio="none"
-        >
-          <path 
-            d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" 
-            className="fill-teal-800"
-          />
-        </svg>
-      </div> */}
-      
+          
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-10 pt-10 pb-2 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Brand Column */}
           <div className="space-y-6 pt-12">
             <Link href="/" className="group inline-block">
@@ -68,12 +54,9 @@ export default function Footer() {
            
             
         
-          </div>
+          </div>                  
           
-          {/* Quick Links Columns */}
-        
-          
-          <div className="space-y-6 pt-10">
+          {/* <div className="space-y-6 pt-10">
             <ul className="space-y-3">
               {[
                 { name: 'About Us', path: '/about' },
@@ -93,7 +76,8 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </div> */}
+
           
           {/* Newsletter Section */}
           <div className="space-y-6 pt-10">
@@ -129,14 +113,14 @@ export default function Footer() {
         
         {/* Bottom Bar */}
         <div className="mt-16 pt-8 border-t border-teal-700/30 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-sm text-teal-300 text-center md:text-left">
+          <p className="text-md text-teal-300 text-center md:text-left">
             © {currentYear}. All rights reserved.
           </p>
           
           <div className="flex flex-wrap justify-center gap-6 mt-4 md:mt-0">
-            <Link href="#" className="text-sm text-teal-300 hover:text-white transition-colors duration-200">Privacy Policy</Link>
-            <Link href="#" className="text-sm text-teal-300 hover:text-white transition-colors duration-200">Terms of Service</Link>
-            <Link href="#" className="text-sm text-teal-300 hover:text-white transition-colors duration-200">Sitemap</Link>
+            <Link href="#" className="text-md text-teal-300 hover:text-white transition-colors duration-200">Privacy Policy</Link>
+            <Link href="#" className="text-md text-teal-300 hover:text-white transition-colors duration-200">Terms of Service</Link>
+            <Link href="#" className="text-md text-teal-300 hover:text-white transition-colors duration-200">Sitemap</Link>
           </div>
         </div>
       </div>

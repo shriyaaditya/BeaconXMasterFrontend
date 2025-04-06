@@ -105,7 +105,7 @@ export default function DisasterIcons({
 
   return (
     <div
-      className="fixed top-22 right-12 z-50 flex flex-col items-end"
+      className="fixed top-5 right-12 z-50 flex flex-col items-end"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -127,10 +127,6 @@ export default function DisasterIcons({
                      bg-red-600 shadow-xl hover:bg-red-700 transition-all focus:ring-2 
                      focus:ring-red-900"
           aria-label={`${internalDisasters.length} alerts - Click for details`}
-          // onClick={(e) => {
-          //   e.preventDefault();
-          //   setIsHovered(!isHovered);
-          // }}
         >
           <span className="absolute inset-0 animate-ripple rounded-full border-2 border-white opacity-70"></span>
           <span className="absolute inset-0 animate-ripple2 rounded-full border-2 border-white opacity-40"></span>
