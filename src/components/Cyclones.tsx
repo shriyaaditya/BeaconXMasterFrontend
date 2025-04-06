@@ -9,7 +9,9 @@ import {
   MapPin,
 } from "lucide-react";
 import { getLatestCyclone , fetchCyclonePredictions , cycloneData} from "@/lib/cyclones";
-import GoogleMapBox from "@/components/GoogleMapBox";
+// import GoogleMapBox from "@/components/GoogleMapBox";
+import dynamic from "next/dynamic";
+const GoogleMapBox = dynamic(() => import("@/components/GoogleMapBox"), { ssr: false });
 
 
 export default function CyclonePage() {

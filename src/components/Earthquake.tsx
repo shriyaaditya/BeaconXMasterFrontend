@@ -12,7 +12,10 @@ import {
   Activity,
   MapPin,
 } from "lucide-react";
-import GoogleMapBox from "@/components/GoogleMapBox";
+// import GoogleMapBox from "@/components/GoogleMapBox";
+import dynamic from "next/dynamic";
+const GoogleMapBox = dynamic(() => import("@/components/GoogleMapBox"), { ssr: false });
+
 import { getAllEarthquakes } from "@/lib/earthquake"; 
 import Link from "next/link";
 
