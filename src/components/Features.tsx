@@ -28,7 +28,7 @@ const features = [
     role: "International Relief Coordinator",
     content: "The comprehensive news aggregation feature provides real-time updates from disaster zones worldwide, allowing us to respond promptly to emerging situations.",
     icon: <Globe className="h-16 w-16 text-blue-600" />,
-    image: "/api/placeholder/800/400", 
+    image: "/global-mapping.jpg", 
     color: "from-blue-500 to-indigo-600"
   },
   {
