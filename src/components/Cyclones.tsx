@@ -66,7 +66,7 @@ export default function CyclonePage() {
     <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-3 gap-4 mb-4">
 
         <div className="bg-gray-800 p-6 rounded-lg row-span-3 col-span-2 flex flex-col items-center justify-center h-full">
-          {/* <MapPin className="w-10 h-10 text-gray-600 mb-4" /> */}
+          
           <GoogleMapBox
              center={
               cyclone && cyclone.predictedPath && cyclone.predictedPath.length > 0
