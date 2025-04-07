@@ -1,11 +1,12 @@
+import { Suspense } from "react"
 import CyclonePage from "@/components/Cyclones"
 import CycloneInvertory from "@/app/inventory/page"
 
 export default function DisasterPage(){
     return (
-        <div>
+        <Suspense fallback={<p>Loading cyclone data...</p>}>
             <CyclonePage />
             <CycloneInvertory />
-        </div>
+        </Suspense>
     )
 }

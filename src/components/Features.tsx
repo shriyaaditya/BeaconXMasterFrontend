@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import React, { useState, useRef } from "react";
 import { ChevronLeft, ChevronRight, AlertTriangle, BarChart2, Globe, MessageCircle } from "lucide-react";

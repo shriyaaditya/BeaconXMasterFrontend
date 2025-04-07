@@ -12,7 +12,7 @@ import {
   Activity,
   MapPin,
 } from "lucide-react";
-// import GoogleMapBox from "@/components/GoogleMapBox";
+
 import dynamic from "next/dynamic";
 const GoogleMapBox = dynamic(() => import("@/components/GoogleMapBox"), { ssr: false });
 

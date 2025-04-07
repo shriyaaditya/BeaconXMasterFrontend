@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-// import { motion } from "framer-motion";
 import {
   Clock,
   Compass,
@@ -9,7 +8,6 @@ import {
   MapPin,
 } from "lucide-react";
 import { getLatestCyclone , fetchCyclonePredictions , cycloneData} from "@/lib/cyclones";
-// import GoogleMapBox from "@/components/GoogleMapBox";
 import dynamic from "next/dynamic";
 const GoogleMapBox = dynamic(() => import("@/components/GoogleMapBox"), { ssr: false });
 

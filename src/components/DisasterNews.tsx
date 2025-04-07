@@ -1,5 +1,4 @@
-
-'use client';
+'use client'
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { AlertCircle, Wind, Map } from 'lucide-react';
