@@ -1,3 +1,4 @@
+"use client"
 
 import './global.css';
 import Navbar from '@/components/Navbar';
