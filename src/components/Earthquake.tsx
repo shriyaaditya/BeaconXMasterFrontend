@@ -137,7 +137,6 @@ export default function EarthquakePage() {
           zoom={10}
           mapTypeId="hybrid"
           center={latestEarthquake ? { lat: latestEarthquake.latitude, lng: latestEarthquake.longitude } : undefined}
-          // center={{lat: 19.07, lng: 72.87}}
           showOpenSpaces={true}
           showShelterPoints={true}
         />

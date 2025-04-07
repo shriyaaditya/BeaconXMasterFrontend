@@ -8,6 +8,7 @@ import {
   MapPin,
 } from "lucide-react";
 import { getLatestCyclone , fetchCyclonePredictions , cycloneData} from "@/lib/cyclones";
+
 import dynamic from "next/dynamic";
 const GoogleMapBox = dynamic(() => import("@/components/GoogleMapBox"), { ssr: false });
 
@@ -21,8 +22,15 @@ export default function CyclonePage() {
         setLoading(true);
         try {
           const data = await getLatestCyclone();
-          const predictions = await fetchCyclonePredictions(data);
-          setCyclone({ ...data, ...predictions });
+          setCyclone(data); 
+      
+          try {
+            const predictions = await fetchCyclonePredictions(data);
+            setCyclone((prev) => prev ? { ...prev, ...predictions } : null);
+          } catch (predErr) {
+            console.error("Prediction model failed:", predErr);
+          }
+      
           setLastUpdated(new Date().toLocaleString());
         } catch (err) {
           console.error("Error fetching cyclone data:", err);
@@ -60,9 +68,14 @@ export default function CyclonePage() {
         <div className="bg-gray-800 p-6 rounded-lg row-span-3 col-span-2 flex flex-col items-center justify-center h-full">
           {/* <MapPin className="w-10 h-10 text-gray-600 mb-4" /> */}
           <GoogleMapBox
-            // center={{ lat: item.lat, lng: item.lng }}
-            zoom={10}
-            mapTypeId="hybrid"
+             center={
+              cyclone && cyclone.predictedPath && cyclone.predictedPath.length > 0
+                ? { lat: cyclone.predictedPath[0].lat, lng: cyclone.predictedPath[0].lon }
+                : { lat: parseFloat(cyclone?.lat || "20.5937"), lng: parseFloat(cyclone?.lon || "78.9629") }
+              }
+              zoom={6}
+              mapTypeId="hybrid"
+              predictedPath={cyclone?.predictedPath}
             />
         </div>
 
@@ -112,7 +125,7 @@ export default function CyclonePage() {
               <h3 className="text-gray-400">Predicted Severity</h3>
               <Compass className="w-5 h-5 text-red-400" />
             </div>
-            <p className="text-red-300">{cyclone.severity}</p>
+            <p className="text-red-300">{cyclone.severity || "Predicting..."}</p>
           </div>
 
           {/* Predicted Wind Speed */}
@@ -121,7 +134,26 @@ export default function CyclonePage() {
               <h3 className="text-gray-400">Predicted Wind Speed</h3>
               <Wind className="w-5 h-5 text-pink-400" />
             </div>
-            <p className="text-pink-300">{cyclone.predictedSpeed} knots</p>
+            <p className="text-pink-300">{cyclone.predictedSpeed ? `${cyclone.predictedSpeed} knots` : "Predicting..."}</p>
+          </div>
+
+          {/* Predicted Path */}
+          <div className="bg-gray-800 p-6 rounded-lg md:col-span-2">
+            <div className="flex justify-between mb-2">
+              <h3 className="text-gray-400">Predicted Path</h3>
+              <MapPin className="w-5 h-5 text-orange-400" />
+            </div>
+            {cyclone.predictedPath ? (
+              <ul className="text-orange-300 text-sm max-h-40 overflow-auto space-y-1">
+                {cyclone.predictedPath.map((point, index) => (
+                  <li key={index}>
+                    Point {index + 1}: Lat {point.lat}, Lon {point.lon}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-orange-300">Predicting path...</p>
+            )}
           </div>
 
         </div>

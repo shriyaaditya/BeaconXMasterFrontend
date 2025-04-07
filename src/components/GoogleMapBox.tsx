@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useState, useEffect } from "react";
-import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
+import { GoogleMap, useJsApiLoader, Marker, Polyline } from "@react-google-maps/api";
 import { GOOGLE_MAPS_CONFIG } from "@/lib/googleMapsConfig";
 
 type Props = {
@@ -12,6 +12,7 @@ type Props = {
   zoom?: number;
   showOpenSpaces?: boolean;
   showShelterPoints?: boolean;
+  predictedPath?: { lat: number; lon: number }[];
 };
 
 type OverpassElement = {
@@ -45,11 +46,8 @@ const defaultCenter = {
   lng: 78.9629, // India default
 };
 
-const GoogleMapBox: React.FC<Props> = ({ center = defaultCenter, markers = [], mapTypeId = "roadmap", zoom = 5, showOpenSpaces = false, showShelterPoints = false }) => {
-  // const { isLoaded } = useJsApiLoader({
-  //   id: "google-map-script",
-  //   googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "", // Add key in .env
-  // });
+const GoogleMapBox: React.FC<Props> = ({ center = defaultCenter, markers = [], mapTypeId = "roadmap", zoom = 5, showOpenSpaces = false, showShelterPoints = false, predictedPath = [] }) => {
+  
   const { isLoaded } = useJsApiLoader(GOOGLE_MAPS_CONFIG);
 
   const [openSpaces, setOpenSpaces] = useState<{ lat: number; lng: number }[]>([]);
@@ -165,6 +163,19 @@ const GoogleMapBox: React.FC<Props> = ({ center = defaultCenter, markers = [], m
           }}
         />
       ))}
+
+      {predictedPath.length > 1 && (
+        <Polyline
+            path={predictedPath.map((point) => ({ lat: point.lat, lng: point.lon }))}
+            options={{
+            strokeColor: "#FF0000",
+            strokeOpacity: 0.8,
+            strokeWeight: 3,
+            clickable: false,
+            geodesic: true,
+          }}
+        />
+      )}
 
     </GoogleMap>
   ) : (
