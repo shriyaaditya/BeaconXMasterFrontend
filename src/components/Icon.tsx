@@ -105,7 +105,7 @@ export default function DisasterIcons({
 
   return (
     <div
-      className="fixed top-5 right-12 z-50 flex flex-col items-end"
+      className="fixed top-22 right-12 z-50 flex flex-col items-end"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
