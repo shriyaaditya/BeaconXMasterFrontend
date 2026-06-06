@@ -22,9 +22,9 @@
       {
         "item_code": "IDRN-GEN-601",
         "name": "Portable Diesel Generator Set (5kVA)",
-        "available_qty": 40,
+        "available_qty": 26,
         "min_threshold": 4,
-        "last_updated": "2026-06-06T13:42:42.989Z",
+        "last_updated": "2026-06-06T13:51:33.136Z",
         "metadata": {
           "category": "Lighting & Power",
           "unit": "pieces",
@@ -34,9 +34,9 @@
       {
         "item_code": "IDRN-MED-103",
         "name": "Emergency Stretcher (Foldable)",
-        "available_qty": 1,
+        "available_qty": 0,
         "min_threshold": 22,
-        "last_updated": "2026-06-06T13:31:37.385Z",
+        "last_updated": "2026-06-06T13:50:18.128Z",
         "metadata": {
           "category": "Medical Supplies",
           "unit": "pieces",
@@ -142,9 +142,9 @@
       {
         "item_code": "IDRN-SHT-402",
         "name": "Tarpaulin Sheet (High-density, 15x15 ft)",
-        "available_qty": 77,
+        "available_qty": 91,
         "min_threshold": 102,
-        "last_updated": "2026-06-06T13:36:52.463Z",
+        "last_updated": "2026-06-06T13:49:58.117Z",
         "metadata": {
           "category": "Shelter & Camps",
           "unit": "pieces",
@@ -152,7 +152,7 @@
         }
       }
     ],
-    "last_sync": "2026-06-06T13:48:23.061Z"
+    "last_sync": "2026-06-06T13:51:33.136Z"
   },
   {
     "center_id": "wh-mum-sub-002",
@@ -237,9 +237,9 @@
       {
         "item_code": "IDRN-LGT-201",
         "name": "Aska Inflatable Light Tower (400W LED)",
-        "available_qty": 30,
+        "available_qty": 35,
         "min_threshold": 7,
-        "last_updated": "2026-06-06T13:37:02.463Z",
+        "last_updated": "2026-06-06T13:50:13.118Z",
         "metadata": {
           "category": "Lighting & Power",
           "unit": "pieces",
@@ -321,9 +321,9 @@
       {
         "item_code": "IDRN-MED-103",
         "name": "Emergency Stretcher (Foldable)",
-        "available_qty": 27,
+        "available_qty": 23,
         "min_threshold": 21,
-        "last_updated": "2026-06-06T13:20:04.033Z",
+        "last_updated": "2026-06-06T13:51:38.139Z",
         "metadata": {
           "category": "Medical Supplies",
           "unit": "pieces",
@@ -343,7 +343,7 @@
         }
       }
     ],
-    "last_sync": "2026-06-06T13:45:08.033Z"
+    "last_sync": "2026-06-06T13:51:38.139Z"
   },
   {
     "center_id": "wh-mum-sub-003",
@@ -380,13 +380,13 @@
       {
         "item_code": "IDRN-MED-102",
         "name": "Mobile Medical Unit Van",
-        "available_qty": 3,
+        "available_qty": 0,
         "min_threshold": 2,
-        "last_updated": "2026-06-06T13:20:04.033Z",
+        "last_updated": "2026-06-06T13:49:33.123Z",
         "metadata": {
           "category": "Medical Supplies",
           "unit": "vehicles",
-          "status": "Adequate"
+          "status": "Critical"
         }
       },
       {
@@ -406,7 +406,7 @@
         "name": "High-Capacity Diesel Water Pump (5 HP)",
         "available_qty": 0,
         "min_threshold": 6,
-        "last_updated": "2026-06-06T13:48:53.108Z",
+        "last_updated": "2026-06-06T13:50:43.125Z",
         "metadata": {
           "category": "Water & Sanitation",
           "unit": "pieces",
@@ -452,9 +452,9 @@
       {
         "item_code": "IDRN-LGT-202",
         "name": "Handheld LED Searchlight (Rechargeable)",
-        "available_qty": 135,
+        "available_qty": 124,
         "min_threshold": 46,
-        "last_updated": "2026-06-06T13:29:47.354Z",
+        "last_updated": "2026-06-06T13:51:53.139Z",
         "metadata": {
           "category": "Lighting & Power",
           "unit": "pieces",
@@ -476,9 +476,9 @@
       {
         "item_code": "IDRN-SHT-401",
         "name": "Family Relief Tent (Waterproof, 6-person)",
-        "available_qty": 147,
+        "available_qty": 166,
         "min_threshold": 28,
-        "last_updated": "2026-06-06T13:40:52.521Z",
+        "last_updated": "2026-06-06T13:52:23.145Z",
         "metadata": {
           "category": "Shelter & Camps",
           "unit": "pieces",
@@ -526,7 +526,7 @@
         "name": "Portable Diesel Generator Set (5kVA)",
         "available_qty": 0,
         "min_threshold": 4,
-        "last_updated": "2026-06-06T13:48:03.059Z",
+        "last_updated": "2026-06-06T13:49:53.124Z",
         "metadata": {
           "category": "Lighting & Power",
           "unit": "pieces",
@@ -534,7 +534,7 @@
         }
       }
     ],
-    "last_sync": "2026-06-06T13:48:53.108Z"
+    "last_sync": "2026-06-06T13:52:23.145Z"
   },
   {
     "center_id": "wh-pune-001",
@@ -595,9 +595,9 @@
       {
         "item_code": "IDRN-WAT-301",
         "name": "High-Capacity Diesel Water Pump (5 HP)",
-        "available_qty": 9,
+        "available_qty": 6,
         "min_threshold": 6,
-        "last_updated": "2026-06-06T13:20:04.033Z",
+        "last_updated": "2026-06-06T13:51:58.141Z",
         "metadata": {
           "category": "Water & Sanitation",
           "unit": "pieces",
@@ -703,9 +703,9 @@
       {
         "item_code": "IDRN-GEN-601",
         "name": "Portable Diesel Generator Set (5kVA)",
-        "available_qty": 7,
+        "available_qty": 19,
         "min_threshold": 5,
-        "last_updated": "2026-06-06T13:20:04.033Z",
+        "last_updated": "2026-06-06T13:52:28.140Z",
         "metadata": {
           "category": "Lighting & Power",
           "unit": "pieces",
@@ -715,9 +715,9 @@
       {
         "item_code": "IDRN-GEN-602",
         "name": "Heavy-Duty Diesel Generator Set (15kVA)",
-        "available_qty": 40,
+        "available_qty": 59,
         "min_threshold": 2,
-        "last_updated": "2026-06-06T13:35:32.454Z",
+        "last_updated": "2026-06-06T13:51:08.131Z",
         "metadata": {
           "category": "Lighting & Power",
           "unit": "pieces",
@@ -761,7 +761,7 @@
         }
       }
     ],
-    "last_sync": "2026-06-06T13:48:38.106Z"
+    "last_sync": "2026-06-06T13:52:28.140Z"
   },
   {
     "center_id": "wh-pune-002",
@@ -810,9 +810,9 @@
       {
         "item_code": "IDRN-RE-003",
         "name": "Life Jacket (Adult, high-buoyancy)",
-        "available_qty": 75,
+        "available_qty": 74,
         "min_threshold": 87,
-        "last_updated": "2026-06-06T13:20:04.033Z",
+        "last_updated": "2026-06-06T13:52:03.138Z",
         "metadata": {
           "category": "Rescue Equipment",
           "unit": "pieces",
@@ -858,13 +858,13 @@
       {
         "item_code": "IDRN-GEN-602",
         "name": "Heavy-Duty Diesel Generator Set (15kVA)",
-        "available_qty": 2,
+        "available_qty": 0,
         "min_threshold": 2,
-        "last_updated": "2026-06-06T13:20:04.033Z",
+        "last_updated": "2026-06-06T13:51:13.131Z",
         "metadata": {
           "category": "Lighting & Power",
           "unit": "pieces",
-          "status": "Adequate"
+          "status": "Critical"
         }
       },
       {
@@ -906,9 +906,9 @@
       {
         "item_code": "IDRN-SHT-402",
         "name": "Tarpaulin Sheet (High-density, 15x15 ft)",
-        "available_qty": 156,
+        "available_qty": 154,
         "min_threshold": 103,
-        "last_updated": "2026-06-06T13:36:07.457Z",
+        "last_updated": "2026-06-06T13:50:38.124Z",
         "metadata": {
           "category": "Shelter & Camps",
           "unit": "pieces",
@@ -988,7 +988,7 @@
         }
       }
     ],
-    "last_sync": "2026-06-06T13:46:28.036Z"
+    "last_sync": "2026-06-06T13:52:03.138Z"
   },
   {
     "center_id": "wh-pune-003",
@@ -1157,9 +1157,9 @@
       {
         "item_code": "IDRN-RE-003",
         "name": "Life Jacket (Adult, high-buoyancy)",
-        "available_qty": 233,
+        "available_qty": 234,
         "min_threshold": 90,
-        "last_updated": "2026-06-06T13:38:17.481Z",
+        "last_updated": "2026-06-06T13:52:03.138Z",
         "metadata": {
           "category": "Rescue Equipment",
           "unit": "pieces",
@@ -1203,7 +1203,7 @@
         }
       }
     ],
-    "last_sync": "2026-06-06T13:48:43.105Z"
+    "last_sync": "2026-06-06T13:52:03.138Z"
   },
   {
     "center_id": "wh-thane-001",
@@ -1216,9 +1216,9 @@
       {
         "item_code": "IDRN-GEN-601",
         "name": "Portable Diesel Generator Set (5kVA)",
-        "available_qty": 27,
+        "available_qty": 44,
         "min_threshold": 5,
-        "last_updated": "2026-06-06T13:47:03.042Z",
+        "last_updated": "2026-06-06T13:50:28.121Z",
         "metadata": {
           "category": "Lighting & Power",
           "unit": "pieces",
@@ -1276,9 +1276,9 @@
       {
         "item_code": "IDRN-RE-001",
         "name": "Inflatable Gemini Rescue Boat (6-Person)",
-        "available_qty": 16,
+        "available_qty": 21,
         "min_threshold": 10,
-        "last_updated": "2026-06-06T13:20:04.033Z",
+        "last_updated": "2026-06-06T13:52:08.138Z",
         "metadata": {
           "category": "Rescue Equipment",
           "unit": "pieces",
@@ -1406,7 +1406,7 @@
         }
       }
     ],
-    "last_sync": "2026-06-06T13:47:38.048Z"
+    "last_sync": "2026-06-06T13:52:08.138Z"
   },
   {
     "center_id": "wh-thane-002",
@@ -1601,7 +1601,7 @@
         "name": "Mobile Medical Unit Van",
         "available_qty": 0,
         "min_threshold": 2,
-        "last_updated": "2026-06-06T13:24:17.288Z",
+        "last_updated": "2026-06-06T13:49:48.117Z",
         "metadata": {
           "category": "Medical Supplies",
           "unit": "vehicles",
@@ -1633,7 +1633,7 @@
         }
       }
     ],
-    "last_sync": "2026-06-06T13:46:18.040Z"
+    "last_sync": "2026-06-06T13:49:48.117Z"
   },
   {
     "center_id": "wh-thane-003",
@@ -1684,7 +1684,7 @@
         "name": "Satellite Phone (ISatPhone 2)",
         "available_qty": 0,
         "min_threshold": 3,
-        "last_updated": "2026-06-06T13:29:52.355Z",
+        "last_updated": "2026-06-06T13:50:08.119Z",
         "metadata": {
           "category": "Communication",
           "unit": "pieces",
@@ -1802,9 +1802,9 @@
       {
         "item_code": "IDRN-LGT-202",
         "name": "Handheld LED Searchlight (Rechargeable)",
-        "available_qty": 28,
+        "available_qty": 10,
         "min_threshold": 39,
-        "last_updated": "2026-06-06T13:20:04.033Z",
+        "last_updated": "2026-06-06T13:49:03.114Z",
         "metadata": {
           "category": "Lighting & Power",
           "unit": "pieces",
@@ -1812,7 +1812,7 @@
         }
       }
     ],
-    "last_sync": "2026-06-06T13:48:18.061Z"
+    "last_sync": "2026-06-06T13:50:08.119Z"
   },
   {
     "center_id": "wh-raigad-001",
@@ -1837,9 +1837,9 @@
       {
         "item_code": "IDRN-GEN-602",
         "name": "Heavy-Duty Diesel Generator Set (15kVA)",
-        "available_qty": 1,
+        "available_qty": 0,
         "min_threshold": 2,
-        "last_updated": "2026-06-06T13:20:04.033Z",
+        "last_updated": "2026-06-06T13:51:23.134Z",
         "metadata": {
           "category": "Lighting & Power",
           "unit": "pieces",
@@ -1849,9 +1849,9 @@
       {
         "item_code": "IDRN-SHT-401",
         "name": "Family Relief Tent (Waterproof, 6-person)",
-        "available_qty": 38,
+        "available_qty": 46,
         "min_threshold": 33,
-        "last_updated": "2026-06-06T13:28:22.328Z",
+        "last_updated": "2026-06-06T13:51:18.135Z",
         "metadata": {
           "category": "Shelter & Camps",
           "unit": "pieces",
@@ -1981,9 +1981,9 @@
       {
         "item_code": "IDRN-LGT-201",
         "name": "Aska Inflatable Light Tower (400W LED)",
-        "available_qty": 4,
+        "available_qty": 0,
         "min_threshold": 9,
-        "last_updated": "2026-06-06T13:34:27.421Z",
+        "last_updated": "2026-06-06T13:52:13.144Z",
         "metadata": {
           "category": "Lighting & Power",
           "unit": "pieces",
@@ -1993,9 +1993,9 @@
       {
         "item_code": "IDRN-MED-103",
         "name": "Emergency Stretcher (Foldable)",
-        "available_qty": 14,
+        "available_qty": 3,
         "min_threshold": 21,
-        "last_updated": "2026-06-06T13:41:02.522Z",
+        "last_updated": "2026-06-06T13:51:43.136Z",
         "metadata": {
           "category": "Medical Supplies",
           "unit": "pieces",
@@ -2003,7 +2003,7 @@
         }
       }
     ],
-    "last_sync": "2026-06-06T13:48:08.062Z"
+    "last_sync": "2026-06-06T13:52:13.144Z"
   },
   {
     "center_id": "wh-raigad-002",
@@ -2126,7 +2126,7 @@
         "name": "Portable Diesel Generator Set (5kVA)",
         "available_qty": 0,
         "min_threshold": 5,
-        "last_updated": "2026-06-06T13:46:38.039Z",
+        "last_updated": "2026-06-06T13:52:18.145Z",
         "metadata": {
           "category": "Lighting & Power",
           "unit": "pieces",
@@ -2172,13 +2172,13 @@
       {
         "item_code": "IDRN-LGT-201",
         "name": "Aska Inflatable Light Tower (400W LED)",
-        "available_qty": 9,
+        "available_qty": 1,
         "min_threshold": 7,
-        "last_updated": "2026-06-06T13:20:04.033Z",
+        "last_updated": "2026-06-06T13:50:13.118Z",
         "metadata": {
           "category": "Lighting & Power",
           "unit": "pieces",
-          "status": "Adequate"
+          "status": "Critical"
         }
       },
       {
@@ -2208,9 +2208,9 @@
       {
         "item_code": "IDRN-RE-003",
         "name": "Life Jacket (Adult, high-buoyancy)",
-        "available_qty": 143,
+        "available_qty": 138,
         "min_threshold": 119,
-        "last_updated": "2026-06-06T13:40:02.498Z",
+        "last_updated": "2026-06-06T13:49:08.115Z",
         "metadata": {
           "category": "Rescue Equipment",
           "unit": "pieces",
@@ -2218,7 +2218,7 @@
         }
       }
     ],
-    "last_sync": "2026-06-06T13:48:13.068Z"
+    "last_sync": "2026-06-06T13:52:18.145Z"
   },
   {
     "center_id": "wh-raigad-003",
@@ -2243,9 +2243,9 @@
       {
         "item_code": "IDRN-MED-101",
         "name": "Trauma & First Aid Kit (Large)",
-        "available_qty": 111,
+        "available_qty": 104,
         "min_threshold": 54,
-        "last_updated": "2026-06-06T13:48:58.111Z",
+        "last_updated": "2026-06-06T13:50:48.138Z",
         "metadata": {
           "category": "Medical Supplies",
           "unit": "kits",
@@ -2303,9 +2303,9 @@
       {
         "item_code": "IDRN-LGT-201",
         "name": "Aska Inflatable Light Tower (400W LED)",
-        "available_qty": 21,
+        "available_qty": 25,
         "min_threshold": 7,
-        "last_updated": "2026-06-06T13:48:33.115Z",
+        "last_updated": "2026-06-06T13:52:13.144Z",
         "metadata": {
           "category": "Lighting & Power",
           "unit": "pieces",
@@ -2375,9 +2375,9 @@
       {
         "item_code": "IDRN-RE-003",
         "name": "Life Jacket (Adult, high-buoyancy)",
-        "available_qty": 101,
+        "available_qty": 106,
         "min_threshold": 96,
-        "last_updated": "2026-06-06T13:35:37.444Z",
+        "last_updated": "2026-06-06T13:49:08.115Z",
         "metadata": {
           "category": "Rescue Equipment",
           "unit": "pieces",
@@ -2433,7 +2433,7 @@
         }
       }
     ],
-    "last_sync": "2026-06-06T13:48:58.111Z"
+    "last_sync": "2026-06-06T13:52:13.144Z"
   },
   {
     "center_id": "wh-ratna-001",
@@ -2446,13 +2446,13 @@
       {
         "item_code": "IDRN-WAT-301",
         "name": "High-Capacity Diesel Water Pump (5 HP)",
-        "available_qty": 8,
+        "available_qty": 0,
         "min_threshold": 7,
-        "last_updated": "2026-06-06T13:45:43.030Z",
+        "last_updated": "2026-06-06T13:51:03.131Z",
         "metadata": {
           "category": "Water & Sanitation",
           "unit": "pieces",
-          "status": "Adequate"
+          "status": "Critical"
         }
       },
       {
@@ -2530,9 +2530,9 @@
       {
         "item_code": "IDRN-GEN-602",
         "name": "Heavy-Duty Diesel Generator Set (15kVA)",
-        "available_qty": 41,
+        "available_qty": 50,
         "min_threshold": 2,
-        "last_updated": "2026-06-06T13:46:43.039Z",
+        "last_updated": "2026-06-06T13:50:58.133Z",
         "metadata": {
           "category": "Lighting & Power",
           "unit": "pieces",
@@ -2636,7 +2636,7 @@
         }
       }
     ],
-    "last_sync": "2026-06-06T13:47:43.053Z"
+    "last_sync": "2026-06-06T13:51:03.131Z"
   },
   {
     "center_id": "wh-ratna-002",
@@ -2661,9 +2661,9 @@
       {
         "item_code": "IDRN-FOD-502",
         "name": "Bottled Drinking Water Case (24x1L)",
-        "available_qty": 460,
+        "available_qty": 494,
         "min_threshold": 542,
-        "last_updated": "2026-06-06T13:47:18.048Z",
+        "last_updated": "2026-06-06T13:51:28.136Z",
         "metadata": {
           "category": "Food & Survival",
           "unit": "cases",
@@ -2685,9 +2685,9 @@
       {
         "item_code": "IDRN-SHT-401",
         "name": "Family Relief Tent (Waterproof, 6-person)",
-        "available_qty": 69,
+        "available_qty": 54,
         "min_threshold": 36,
-        "last_updated": "2026-06-06T13:27:52.322Z",
+        "last_updated": "2026-06-06T13:49:23.114Z",
         "metadata": {
           "category": "Shelter & Camps",
           "unit": "pieces",
@@ -2769,9 +2769,9 @@
       {
         "item_code": "IDRN-GEN-601",
         "name": "Portable Diesel Generator Set (5kVA)",
-        "available_qty": 6,
+        "available_qty": 46,
         "min_threshold": 4,
-        "last_updated": "2026-06-06T13:20:04.033Z",
+        "last_updated": "2026-06-06T13:49:38.114Z",
         "metadata": {
           "category": "Lighting & Power",
           "unit": "pieces",
@@ -2839,7 +2839,7 @@
         }
       }
     ],
-    "last_sync": "2026-06-06T13:47:18.048Z"
+    "last_sync": "2026-06-06T13:51:28.136Z"
   },
   {
     "center_id": "wh-ratna-003",
@@ -2864,21 +2864,21 @@
       {
         "item_code": "IDRN-WAT-301",
         "name": "High-Capacity Diesel Water Pump (5 HP)",
-        "available_qty": 0,
+        "available_qty": 48,
         "min_threshold": 6,
-        "last_updated": "2026-06-06T13:37:37.472Z",
+        "last_updated": "2026-06-06T13:50:53.126Z",
         "metadata": {
           "category": "Water & Sanitation",
           "unit": "pieces",
-          "status": "Critical"
+          "status": "Adequate"
         }
       },
       {
         "item_code": "IDRN-RE-001",
         "name": "Inflatable Gemini Rescue Boat (6-Person)",
-        "available_qty": 20,
+        "available_qty": 15,
         "min_threshold": 12,
-        "last_updated": "2026-06-06T13:43:43.012Z",
+        "last_updated": "2026-06-06T13:52:08.138Z",
         "metadata": {
           "category": "Rescue Equipment",
           "unit": "pieces",
@@ -2972,9 +2972,9 @@
       {
         "item_code": "IDRN-RE-002",
         "name": "Fiberglass Speed Boat (10-Person)",
-        "available_qty": 24,
+        "available_qty": 17,
         "min_threshold": 3,
-        "last_updated": "2026-06-06T13:41:12.522Z",
+        "last_updated": "2026-06-06T13:51:48.139Z",
         "metadata": {
           "category": "Rescue Equipment",
           "unit": "pieces",
@@ -2994,6 +2994,6 @@
         }
       }
     ],
-    "last_sync": "2026-06-06T13:47:08.052Z"
+    "last_sync": "2026-06-06T13:52:08.138Z"
   }
 ]
